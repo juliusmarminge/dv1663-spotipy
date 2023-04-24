@@ -4,7 +4,7 @@
 
 - **users** can sign up and create an **account** on the app
 - **accounts** can create **playlists** and add **songs** to their **playlist**.
-- **songs** are created by **artits** and published in **albums** (singles are represented as single-song-albums)
+- **songs** are created by **artists** and published in **albums** (singles are represented as single-song-albums)
 - **albums** contain metadata such as **release date**, **description**, **(more?)**
 - **users** can like **albums**, **artists** and **songs** to "save" them to their **library**, which also contains the **users's** **playlists**
 
