@@ -8,6 +8,14 @@
 - **albums** contain metadata such as **release date**, **description**, **(more?)**
 - **users** can like **albums**, **artists** and **songs** to "save" them to their **library**, which also contains the **users's** **playlists**
 
+### functions / procedures
+
+- 
+
+### triggers
+
+- 
+
 ## implementation alternatives
 
 - an api or sdk to fetch data?
