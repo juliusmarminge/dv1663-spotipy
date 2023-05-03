@@ -1,5 +1,7 @@
 # spotipy
 
+Project whiteboard: https://app.eraser.io/workspace/rPjgfC98r5UL9Q9EIZBu
+
 ## ideas
 
 - **users** can sign up and create an **account** on the app
