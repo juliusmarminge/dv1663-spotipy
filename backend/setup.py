@@ -1,10 +1,106 @@
 import mysql.connector
+from mysql.connector import errorcode
 
 
-mydb = mysql.connector.connect(
+cnx = mysql.connector.connect(
     host="127.0.0.1",
     user="root",
     password="password",
 )
+cursor = cnx.cursor()
 
-print(mydb)
+
+DB_NAME = "spotipy"
+TABLES = {}
+TABLES["songs"] = (
+    "CREATE TABLE `songs` ("
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,"
+    "  `title` varchar(255) NOT NULL,"
+    "  `artist` varchar(255) NOT NULL,"
+    "  `mp3_path` varchar(255) NOT NULL,"
+    "  `cover_path` varchar(255) NOT NULL,"
+    "  PRIMARY KEY (`id`)"
+    ") ENGINE=InnoDB"
+)
+
+SONGS = [
+    {
+        "title": "Danger Zone",
+        "artist": "Harold Faltermeyer",
+        "mp3_path": "/songs/song1.mp3",
+        "cover_path": "https://images.unsplash.com/photo-1541701494587-cb58502866ab?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80",
+    },
+    {
+        "title": "Great Balls of Fire",
+        "artist": "Miles Teller",
+        "mp3_path": "/songs/song2.mp3",
+        "cover_path": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2128&q=80",
+    },
+    {
+        "title": "I Ain't Worried",
+        "artist": "One Republic",
+        "mp3_path": "/songs/song3.mp3",
+        "cover_path": "https://images.unsplash.com/photo-1563089145-599997674d42?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80",
+    },
+]
+
+
+def create_database(cursor):
+    try:
+        cursor.execute(
+            "CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(DB_NAME)
+        )
+    except mysql.connector.Error as err:
+        print("Failed creating database: {}".format(err))
+        exit(1)
+
+
+def insert_song(cursor, title, artist, mp3_path, cover_path):
+    query = (
+        "INSERT INTO songs (title, artist, mp3_path, cover_path) "
+        "VALUES (%s, %s, %s, %s)"
+    )
+
+    values = (title, artist, mp3_path, cover_path)
+    cursor.execute(query, values)
+
+
+try:
+    cursor.execute("USE {}".format(DB_NAME))
+except mysql.connector.Error as err:
+    print("Database {} does not exists.".format(DB_NAME))
+    if err.errno == errorcode.ER_BAD_DB_ERROR:
+        create_database(cursor)
+        print("Database {} created successfully.".format(DB_NAME))
+        cnx.database = DB_NAME
+    else:
+        print(err)
+        exit(1)
+
+for table_name in TABLES:
+    table_description = TABLES[table_name]
+    try:
+        print("Creating table {}: ".format(table_name), end="")
+        cursor.execute(table_description)
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
+            print("already exists.")
+        else:
+            print(err.msg)
+    else:
+        print("OK")
+
+for song in SONGS:
+    insert_song(cursor, **song)
+
+
+cnx.commit()
+
+query = "SELECT title, artist FROM `songs`"
+cursor.execute(query)
+
+for title, artist in cursor:
+    print("{} - {}".format(title, artist))
+
+cursor.close()
+cnx.close()
