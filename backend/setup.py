@@ -12,17 +12,77 @@ cursor = cnx.cursor()
 
 
 DB_NAME = "spotipy"
+
 TABLES = {}
 TABLES["songs"] = (
     "CREATE TABLE `songs` ("
-    "  `id` int(11) NOT NULL AUTO_INCREMENT,"
+    "  `id` int NOT NULL AUTO_INCREMENT,"
     "  `title` varchar(255) NOT NULL,"
     "  `artist` varchar(255) NOT NULL,"
     "  `mp3_path` varchar(255) NOT NULL,"
     "  `cover_path` varchar(255) NOT NULL,"
     "  PRIMARY KEY (`id`)"
-    ") ENGINE=InnoDB"
+    ")"
 )
+
+TABLES["users"] = (
+    "CREATE TABLE `users` ("
+    "  `id` int NOT NULL AUTO_INCREMENT,"
+    "  `username` varchar(255) NOT NULL,"
+    "  `password` varchar(255) NOT NULL,"
+    "  PRIMARY KEY (`id`)"
+    ")"
+)
+
+TABLES["playlists"] = (
+    "CREATE TABLE `playlists` ("
+    "  `id` int NOT NULL AUTO_INCREMENT,"
+    "  `name` varchar(255) NOT NULL,"
+    "  `user_id` int NOT NULL,"
+    "  PRIMARY KEY (`id`),"
+    "  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)"
+    ")"
+)
+
+TABLES["artists"] = (
+    "CREATE TABLE `artists` ("
+    "  `id` int NOT NULL AUTO_INCREMENT,"
+    "  `name` varchar(255) NOT NULL,"
+    "  `biography` varchar(255) NOT NULL,"
+    "  PRIMARY KEY (`id`)"
+    ")"
+)
+
+TABLES["playlist_songs"] = (
+    "CREATE TABLE `playlist_songs` ("
+    "  `playlist_id` int NOT NULL,"
+    "  `song_id` int NOT NULL,"
+    "  PRIMARY KEY (`playlist_id`, `song_id`),"  # don't allow duplicate songs in the same playlist
+    "  FOREIGN KEY (`playlist_id`) REFERENCES `playlists` (`id`),"
+    "  FOREIGN KEY (`song_id`) REFERENCES `songs` (`id`)"
+    ")"
+)
+
+TABLES["artists_songs"] = (
+    "CREATE TABLE `artists_songs` ("
+    "  `artist_id` int NOT NULL,"
+    "  `song_id` int NOT NULL,"
+    "  PRIMARY KEY (`artist_id`, `song_id`),"  # the same artist doesn't publish the same song twice
+    "  FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`),"
+    "  FOREIGN KEY (`song_id`) REFERENCES `songs` (`id`)"
+    ")"
+)
+
+TABLES["users_playlists"] = (
+    "CREATE TABLE `users_playlists` ("
+    "  `playlist_id` int NOT NULL,"
+    "  `user_id` int NOT NULL,"
+    "  PRIMARY KEY (`playlist_id`),"  # one-to-many - a playlist is only created by one user
+    "  FOREIGN KEY (`playlist_id`) REFERENCES `playlists` (`id`),"
+    "  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)"
+    ")"
+)
+
 
 SONGS = [
     {
