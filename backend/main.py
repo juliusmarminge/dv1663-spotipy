@@ -10,6 +10,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://127.0.0.1:3000",
+        "http://localhost:3000",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -27,7 +28,9 @@ async def songs():
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
-    cursor.execute("SELECT * FROM songs")
+    cursor.execute(
+        "SELECT songs.*, artists.name as name FROM songs INNER JOIN artists ON songs.artist_id = artists.id"
+    )
     songs = cursor.fetchall()
     cursor.close()
     cnx.close()
@@ -39,11 +42,6 @@ async def playlists(playlist_id: int):
     print(playlist_id + 1)
 
     return {"message": playlist_id}
-
-
-class Playlist(BaseModel):
-    name: str
-    # user_id: int
 
 
 @app.get("/playlists")
@@ -58,19 +56,19 @@ async def playlists():
     return songs
 
 
+class Playlist(BaseModel):
+    name: str
+    user_id: int
+
+
 @app.post("/playlists")
-async def playlists(name: str):
-    # Create a new playlist for a user
-    print("HELLOO")
-    # playlist = body.dict()
-
-    USER_ID = 5
-
+async def playlists(playlist: Playlist):
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
     cursor.execute(
-        "INSERT INTO playlists (name, user_id) VALUES (%s, %s)", (name, USER_ID)
+        "INSERT INTO playlists (name, user_id) VALUES (%s, %s)",
+        (playlist.name, playlist.user_id),
     )
     cnx.commit()
     cursor.close()
