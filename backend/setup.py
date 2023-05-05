@@ -1,12 +1,13 @@
 import mysql.connector
 from mysql.connector import errorcode
 
+config = {
+    "host": "127.0.0.1",
+    "user": "root",
+    "password": "password",
+}
 
-cnx = mysql.connector.connect(
-    host="127.0.0.1",
-    user="root",
-    password="password",
-)
+cnx = mysql.connector.connect(**config)
 cursor = cnx.cursor()
 
 
@@ -65,42 +66,42 @@ def insert_song(cursor, title, artist, mp3_path, cover_path):
     cursor.execute(query, values)
 
 
-try:
-    cursor.execute("USE {}".format(DB_NAME))
-except mysql.connector.Error as err:
-    print("Database {} does not exists.".format(DB_NAME))
-    if err.errno == errorcode.ER_BAD_DB_ERROR:
-        create_database(cursor)
-        print("Database {} created successfully.".format(DB_NAME))
-        cnx.database = DB_NAME
-    else:
-        print(err)
-        exit(1)
-
-for table_name in TABLES:
-    table_description = TABLES[table_name]
+if __name__ == "__main__":
     try:
-        print("Creating table {}: ".format(table_name), end="")
-        cursor.execute(table_description)
+        cursor.execute("USE {}".format(DB_NAME))
     except mysql.connector.Error as err:
-        if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-            print("already exists.")
+        print("Database {} does not exists.".format(DB_NAME))
+        if err.errno == errorcode.ER_BAD_DB_ERROR:
+            create_database(cursor)
+            print("Database {} created successfully.".format(DB_NAME))
+            cnx.database = DB_NAME
         else:
-            print(err.msg)
-    else:
-        print("OK")
+            print(err)
+            exit(1)
 
-for song in SONGS:
-    insert_song(cursor, **song)
+    for table_name in TABLES:
+        table_description = TABLES[table_name]
+        try:
+            print("Creating table {}: ".format(table_name), end="")
+            cursor.execute(table_description)
+        except mysql.connector.Error as err:
+            if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
+                print("already exists.")
+            else:
+                print(err.msg)
+        else:
+            print("OK")
 
+    for song in SONGS:
+        insert_song(cursor, **song)
 
-cnx.commit()
+    cnx.commit()
 
-query = "SELECT title, artist FROM `songs`"
-cursor.execute(query)
+    query = "SELECT title, artist FROM `songs`"
+    cursor.execute(query)
 
-for title, artist in cursor:
-    print("{} - {}".format(title, artist))
+    for title, artist in cursor:
+        print("{} - {}".format(title, artist))
 
-cursor.close()
-cnx.close()
+    cursor.close()
+    cnx.close()
