@@ -1,5 +1,4 @@
-import mysql.connector
-from mysql.connector import errorcode
+from mysql.connector import MySQLConnection, errorcode, Error as MySQLError
 
 config = {
     "host": "127.0.0.1",
@@ -7,7 +6,7 @@ config = {
     "password": "password",
 }
 
-cnx = mysql.connector.connect(**config)
+cnx = MySQLConnection(**config)
 cursor = cnx.cursor()
 
 
@@ -32,7 +31,7 @@ TABLES["songs"] = (
     "  `cover_path` varchar(255) NOT NULL,"
     "  PRIMARY KEY (`id`),"
     "  FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`)"
-    ")",
+    ")"
 )
 
 TABLES["users"] = (
@@ -118,7 +117,7 @@ def create_database(cursor):
         cursor.execute(
             "CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(DB_NAME)
         )
-    except mysql.connector.Error as err:
+    except MySQLError as err:
         print("Failed creating database: {}".format(err))
         exit(1)
 
@@ -143,7 +142,7 @@ def insert_artist(cursor, name, biography):
 if __name__ == "__main__":
     try:
         cursor.execute("USE {}".format(DB_NAME))
-    except mysql.connector.Error as err:
+    except MySQLError as err:
         print("Database {} does not exists.".format(DB_NAME))
         if err.errno == errorcode.ER_BAD_DB_ERROR:
             create_database(cursor)
@@ -158,7 +157,7 @@ if __name__ == "__main__":
         try:
             print("Creating table {}: ".format(table_name), end="")
             cursor.execute(table_description)
-        except mysql.connector.Error as err:
+        except MySQLError as err:
             if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
                 print("already exists.")
             else:
