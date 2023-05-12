@@ -24,6 +24,7 @@ export default async function Home(props: { params: { id: string } }) {
 }
 
 function SongCard(props: Song & { idx: number } & Artist) {
+  console.log(props);
   return (
     <div className="flex p-2 gap-4 hover:bg-background transition-colors group rounded hover:text-foreground-muted">
       <div className="w-8 flex items-center justify-center">
@@ -39,6 +40,18 @@ function SongCard(props: Song & { idx: number } & Artist) {
       <div className="flex-1 flex flex-col w-[60ch]">
         <h1 className="text-xl font-bold">{props.title}</h1>
         <h2 className="hover:underline cursor-pointer">{props.name}</h2>
+        <audio src="">helllo</audio>
+        <figure>
+          <figcaption>Listen to the T-Rex:</figcaption>
+          <audio
+            controls
+            src={`http://127.0.0.1:8000/static/${props.mp3_path}`}
+          >
+            <a href={`http://127.0.0.1:8000/static/${props.mp3_path}`}>
+              Download audio
+            </a>
+          </audio>
+        </figure>
       </div>
       <button className="group rounded-full flex items-center justify-center w-10">
         <Icons.More className="hidden group-hover:block" />
