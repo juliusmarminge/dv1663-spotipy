@@ -85,28 +85,28 @@ TABLES["users_playlists"] = (
 
 
 ARTISTS = [
-    {"name": "Harold Faltermeyer", "biography": "blah blah blah"},
+    {"name": "Coldplay", "biography": "blah blah blah"},
     {"name": "Miles Teller", "biography": "blah blah blah2"},
     {"name": "One Republic", "biography": "blah blah blah3"},
 ]
 
 SONGS = [
     {
-        "title": "Danger Zone",
+        "title": "Sky Full of Stars",
         "artist_id": 1,
-        "mp3_path": "/songs/song1.mp3",
+        "mp3_path": "/static/sky-full-of-stars.mp3",
         "cover_path": "https://images.unsplash.com/photo-1541701494587-cb58502866ab?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80",
     },
     {
         "title": "Great Balls of Fire",
         "artist_id": 2,
-        "mp3_path": "/songs/song2.mp3",
+        "mp3_path": "/static/great-balls-of-fire.mp3",
         "cover_path": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2128&q=80",
     },
     {
         "title": "I Ain't Worried",
         "artist_id": 3,
-        "mp3_path": "/songs/song3.mp3",
+        "mp3_path": "/static/i-aint-worried.mp3",
         "cover_path": "https://images.unsplash.com/photo-1563089145-599997674d42?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80",
     },
 ]
