@@ -27,17 +27,26 @@ function useInterval(callback: (...args: any[]) => any, delay: number) {
   return setCallbackRunning;
 }
 
-export function Playbar() {
-  const { song } = useCurrentSong();
-  const audioTrack = React.useRef<HTMLAudioElement>(null);
+function formatDuration(seconds: number) {
+  const formatter = Intl.DateTimeFormat(undefined, {
+    minute: "2-digit",
+    second: "2-digit",
+  });
+  const ms = seconds * 1000;
+  return formatter.format(ms);
+}
 
+export function Playbar() {
+  const audioTrack = React.useRef<HTMLAudioElement>(null);
   const [seekValue, setSeekValue] = React.useState<number | null>(null);
   const [progress, setProgress] = React.useState(0);
+  const [duration, setDuration] = React.useState(0);
   const setIntervalRunning = useInterval(() => {
     if (!audioTrack.current) return;
     setProgress(audioTrack.current.currentTime);
   }, 100);
 
+  const { song } = useCurrentSong();
   const { isPlaying, setIsPlaying } = useIsPlaying();
   React.useEffect(() => {
     if (!audioTrack.current) return;
@@ -59,6 +68,16 @@ export function Playbar() {
     }
   }
 
+  function handlePrevious() {
+    // TODO
+    // setSong({ ... });
+  }
+
+  function handleNext() {
+    // TODO
+    // setSong({ ... });
+  }
+
   React.useEffect(() => {
     if (!song) return;
     if (audioTrack.current?.paused) audioTrack.current?.play();
@@ -67,7 +86,7 @@ export function Playbar() {
 
   return (
     <div className="flex items-center justify-between h-full px-4">
-      <div className="flex items-center gap-4 w-[64ch]">
+      <div className="flex items-center gap-4 w-[24ch]">
         <img
           src={song?.cover_path}
           className="h-12 w-12 rounded-sm select-none"
@@ -79,28 +98,51 @@ export function Playbar() {
           </h2>
         </div>
       </div>
-      <audio ref={audioTrack} src={`${API_URL}${song?.mp3_path}`} />
-      <Slider
-        value={[seekValue ?? progress]}
-        onValueChange={([value]) => {
-          setIntervalRunning(false);
-          setSeekValue(value);
-        }}
-        onValueCommit={([value]) => {
-          setSeekValue(null);
-          setProgress(value);
-          setIntervalRunning(true);
-          audioTrack.current!.currentTime = value!;
-        }}
-        max={audioTrack.current?.duration ?? 100}
-        step={0.01}
-      />
-      <div className="flex items-center gap-4">
-        <button className="rounded-full flex items-center justify-center w-10">
+
+      {/** Seekbar */}
+      <div className="flex gap-2 flex-1 w-full max-w-2xl">
+        <span className="text-sm text-foreground/80 mr-2">
+          {formatDuration(progress)}
+        </span>
+        <audio
+          ref={audioTrack}
+          src={`${API_URL}${song?.mp3_path}`}
+          onEnded={handleNext}
+          onLoadedMetadata={() => {
+            setDuration(audioTrack.current!.duration);
+          }}
+        />
+
+        <Slider
+          value={[seekValue ?? progress]}
+          onValueChange={([value]) => {
+            setIntervalRunning(false);
+            setSeekValue(value);
+          }}
+          onValueCommit={([value]) => {
+            setSeekValue(null);
+            setProgress(value);
+            setIntervalRunning(true);
+            audioTrack.current!.currentTime = value!;
+          }}
+          max={duration}
+          step={0.01}
+        />
+        <span className="text-sm text-foreground/80 ml-2">
+          {formatDuration(duration)}
+        </span>
+      </div>
+
+      {/** Controls */}
+      <div className="flex items-center ml-4">
+        <button
+          className="rounded-full flex items-center justify-center w-8"
+          onClick={handlePrevious}
+        >
           <Icons.Previous className="h-4 w-4" />
         </button>
         <button
-          className="rounded-full flex items-center justify-center w-10"
+          className="rounded-full flex items-center justify-center w-8"
           onClick={togglePlay}
         >
           {isPlaying ? (
@@ -109,7 +151,10 @@ export function Playbar() {
             <Icons.Play className={twMerge("h-4 w-4")} />
           )}
         </button>
-        <button className="rounded-full flex items-center justify-center w-10">
+        <button
+          className="rounded-full flex items-center justify-center w-8"
+          onClick={handleNext}
+        >
           <Icons.Next className="h-4 w-4" />
         </button>
       </div>
