@@ -1,10 +1,9 @@
 "use client";
 
 import * as React from "react";
+import { API_URL } from "~/app/contants";
 import { Button } from "~/components/button";
 import { Input } from "~/components/input";
-
-const API_URL = "http://127.0.0.1:8000";
 
 export function CreatePlaylistForm() {
   const ref = React.useRef<HTMLFormElement>(null);

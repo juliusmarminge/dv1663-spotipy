@@ -1,7 +1,6 @@
 import { Playlist } from "~/types/models";
-import { CreatePlaylistForm } from "./playlist-form";
-
-const API_URL = "http://127.0.0.1:8000";
+import { CreatePlaylistForm } from "~/components/playlist-form";
+import { API_URL } from "~/app/contants";
 
 export async function Playlists() {
   const res2 = await fetch(`${API_URL}/playlists`);

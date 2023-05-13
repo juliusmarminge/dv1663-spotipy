@@ -24,6 +24,9 @@
   * {
     @apply border-foreground;
   }
+  *::-webkit-scrollbar {
+    display: none;
+  }
   body {
     @apply bg-background text-foreground;
   }
