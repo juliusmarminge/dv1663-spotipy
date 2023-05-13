@@ -13,3 +13,10 @@ pip3 install -r requirements.txt
 ```bash
 uvicorn main:app --reload
 ```
+
+3. Initialize the database
+
+```bash
+python3 setup.py
+python3 seed.py
+```
