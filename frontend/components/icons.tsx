@@ -21,6 +21,22 @@ export function More(props: IconProps) {
   );
 }
 
+export function ChevronRight(props: IconProps) {
+  const { className, ...rest } = props;
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={twMerge("h-6 fill-current stroke-current", className)}
+    >
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  );
+}
+
 export function Home(props: IconProps) {
   const { className, ...rest } = props;
   return (
