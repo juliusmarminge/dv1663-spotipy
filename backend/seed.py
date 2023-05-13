@@ -1,4 +1,4 @@
-from mysql.connector import MySQLConnection, Error as MySQLError
+from mysql.connector import MySQLConnection, Error as MySQLError, errorcode
 from setup import config, DB_NAME
 
 ARTISTS = [
@@ -56,6 +56,41 @@ def insert_artist(cursor, name, biography):
         print(err)
 
 
+def initialize_toplist(cursor):
+    query = "INSERT INTO users (username, password) VALUES ('Spotipy', 'supersecretpassword')"
+    try:
+        print("Creating master admin: ", end="")
+        cursor.execute(query)
+        print("OK")
+    except MySQLError as err:
+        if err.errno == errorcode.ER_DUP_ENTRY:
+            print("admin already exists")
+            return
+        print(err)
+
+    user_id = cursor.lastrowid
+
+    # Global Top Songs playlist
+    try:
+        query = f"INSERT INTO playlists (name, user_id) VALUES ('Global Top Songs', {user_id})"
+        print("Creating Global Top Songs playlist: ", end="")
+        cursor.execute(query)
+        playlist_id = cursor.lastrowid
+        query = f"INSERT INTO users_playlists (user_id, playlist_id) VALUES ({user_id}, {playlist_id})"
+        cursor.execute(query)
+        print("OK")
+    except MySQLError as err:
+        print(err)
+
+    # Add songs to playlist
+    for song_id in range(1, len(SONGS) + 1):
+        try:
+            query = f"INSERT INTO playlist_songs (playlist_id, song_id) VALUES ({playlist_id}, {song_id})"
+            cursor.execute(query)
+        except MySQLError as err:
+            print(err)
+
+
 if __name__ == "__main__":
     cnx = MySQLConnection(**config)
     cursor = cnx.cursor()
@@ -71,6 +106,8 @@ if __name__ == "__main__":
     for song in SONGS:
         insert_song(cursor, **song)
 
+    playlist_id = initialize_toplist(cursor)
+
     print("Seeding complete!\n")
 
     print("Songs:")
@@ -78,8 +115,5 @@ if __name__ == "__main__":
     cursor.execute(query)
     for title, artist_name in cursor.fetchall():
         print(f"  {title} by {artist_name}")
-
-    query = "INSERT INTO users (username, password) VALUES ('admin', 'password')"
-    cursor.execute(query)
 
     cnx.commit()

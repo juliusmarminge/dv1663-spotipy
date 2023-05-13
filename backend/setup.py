@@ -36,7 +36,8 @@ TABLES["users"] = (
     "  `id` int NOT NULL AUTO_INCREMENT,"
     "  `username` varchar(255) NOT NULL,"
     "  `password` varchar(255) NOT NULL,"
-    "  PRIMARY KEY (`id`)"
+    "  PRIMARY KEY (`id`),"
+    "  UNIQUE KEY `username` (`username`)"
     ")"
 )
 
@@ -56,16 +57,6 @@ TABLES["playlist_songs"] = (
     "  `song_id` int NOT NULL,"
     "  PRIMARY KEY (`playlist_id`, `song_id`),"  # don't allow duplicate songs in the same playlist
     "  FOREIGN KEY (`playlist_id`) REFERENCES `playlists` (`id`),"
-    "  FOREIGN KEY (`song_id`) REFERENCES `songs` (`id`)"
-    ")"
-)
-
-TABLES["artists_songs"] = (
-    "CREATE TABLE `artists_songs` ("
-    "  `artist_id` int NOT NULL,"
-    "  `song_id` int NOT NULL,"
-    "  PRIMARY KEY (`artist_id`, `song_id`),"  # the same artist doesn't publish the same song twice
-    "  FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`),"
     "  FOREIGN KEY (`song_id`) REFERENCES `songs` (`id`)"
     ")"
 )
