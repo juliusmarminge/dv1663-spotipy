@@ -1,7 +1,8 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { Playlists } from "../components/playlist-list";
+import { Playlists } from "~/components/playlist-list";
 import * as Icons from "~/components/icons";
+import { Playbar } from "~/components/playbar";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -46,8 +47,4 @@ export default async function RootLayout({
       </body>
     </html>
   );
-}
-
-function Playbar() {
-  return <div className="font-bold text-4xl text-center">PLAYBAR HERE</div>;
 }
