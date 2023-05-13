@@ -2,6 +2,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { Playlists } from "~/components/playlist-list";
 import * as Icons from "~/components/icons";
+import { UserSwitcher } from "~/components/user-switcher";
 import { Playbar } from "~/components/playbar";
 import { twMerge } from "tailwind-merge";
 
@@ -21,7 +22,10 @@ export default async function RootLayout({
     <html lang="en">
       <body className={twMerge(inter.variable, "font-sans")}>
         <div className="container mx-auto relative h-screen">
-          <h1 className="text-4xl font-bold pt-12 pb-6">Spotipy</h1>
+          <div className="flex justify-between items-center pt-12 pb-6">
+            <h1 className="text-4xl font-bold">Spotipy</h1>
+            <UserSwitcher />
+          </div>
           <div className="flex gap-4 h-[calc(100vh-12rem)]">
             <aside className="max-w-sm rounded-lg overflow-y-scroll space-y-4">
               <nav className="p-4 rounded-lg max-w-sm space-y-4 bg-background-muted">
