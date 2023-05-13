@@ -6,9 +6,6 @@ config = {
     "password": "password",
 }
 
-cnx = MySQLConnection(**config)
-cursor = cnx.cursor()
-
 
 DB_NAME = "spotipy"
 
@@ -84,103 +81,46 @@ TABLES["users_playlists"] = (
 )
 
 
-ARTISTS = [
-    {"name": "Coldplay", "biography": "blah blah blah"},
-    {"name": "Miles Teller", "biography": "blah blah blah2"},
-    {"name": "One Republic", "biography": "blah blah blah3"},
-]
-
-SONGS = [
-    {
-        "title": "Sky Full of Stars",
-        "artist_id": 1,
-        "mp3_path": "/static/sky-full-of-stars.mp3",
-        "cover_path": "https://images.unsplash.com/photo-1541701494587-cb58502866ab?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80",
-    },
-    {
-        "title": "Great Balls of Fire",
-        "artist_id": 2,
-        "mp3_path": "/static/great-balls-of-fire.mp3",
-        "cover_path": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2128&q=80",
-    },
-    {
-        "title": "I Ain't Worried",
-        "artist_id": 3,
-        "mp3_path": "/static/i-aint-worried.mp3",
-        "cover_path": "https://images.unsplash.com/photo-1563089145-599997674d42?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80",
-    },
-]
-
-
 def create_database(cursor):
     try:
-        cursor.execute(
-            "CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(DB_NAME)
-        )
+        cursor.execute(f"CREATE DATABASE {DB_NAME} DEFAULT CHARACTER SET 'utf8'")
     except MySQLError as err:
-        print("Failed creating database: {}".format(err))
+        print(f"Failed creating database: {err}")
         exit(1)
 
 
-def insert_song(cursor, title, artist_id, mp3_path, cover_path):
-    query = (
-        "INSERT INTO songs (title, artist_id, mp3_path, cover_path) "
-        "VALUES (%s, %s, %s, %s)"
-    )
-
-    values = (title, artist_id, mp3_path, cover_path)
-    cursor.execute(query, values)
-
-
-def insert_artist(cursor, name, biography):
-    query = "INSERT INTO artists (name, biography) VALUES (%s, %s)"
-
-    values = (name, biography)
-    cursor.execute(query, values)
+def create_table(cursor, name, query):
+    try:
+        print(f"Creating table {name}: ", end="")
+        cursor.execute(query)
+        print("OK")
+    except MySQLError as err:
+        if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
+            print("already exists.")
+        else:
+            print(err.msg)
 
 
 if __name__ == "__main__":
+    cnx = MySQLConnection(**config)
+    cursor = cnx.cursor()
+
     try:
-        cursor.execute("USE {}".format(DB_NAME))
+        cursor.execute(f"USE {DB_NAME}")
     except MySQLError as err:
-        print("Database {} does not exists.".format(DB_NAME))
+        print(f"Database {DB_NAME} does not exists.")
         if err.errno == errorcode.ER_BAD_DB_ERROR:
             create_database(cursor)
-            print("Database {} created successfully.".format(DB_NAME))
+            print(f"Database {DB_NAME} created successfully.")
             cnx.database = DB_NAME
         else:
             print(err)
             exit(1)
 
     for table_name in TABLES:
-        table_description = TABLES[table_name]
-        try:
-            print("Creating table {}: ".format(table_name), end="")
-            cursor.execute(table_description)
-        except MySQLError as err:
-            if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-                print("already exists.")
-            else:
-                print(err.msg)
-        else:
-            print("OK")
-
-    for artist in ARTISTS:
-        insert_artist(cursor, **artist)
-
-    for song in SONGS:
-        insert_song(cursor, **song)
+        query = TABLES[table_name]
+        create_table(cursor, table_name, query)
 
     cnx.commit()
-
-    query = "SELECT title, artists.name FROM `songs` inner join `artists` on songs.artist_id = artists.id"
-    cursor.execute(query)
-    cursor.fetchall()
-
-    query = "INSERT INTO users (username, password) VALUES ('admin', 'password')"
-    cursor.execute(query)
-
-    cnx.commit()
-
     cursor.close()
     cnx.close()
