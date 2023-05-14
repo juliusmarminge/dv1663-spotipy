@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import * as Icons from "./icons";
 import { Button } from "./button";
 import {
   DropdownMenu,
@@ -19,91 +20,169 @@ import {
   DialogTrigger,
 } from "./dialog";
 import { Input } from "./input";
+import { API_URL } from "~/app/contants";
+import { User } from "~/types/models";
+import Image from "next/image";
 
-const imaginaryUsers = [
-  {
-    id: 1,
-    username: "johndoe",
-    avatar:
-      "https://fastly.picsum.photos/id/868/200/200.jpg?hmac=TH6VPbfiRO1pMY4ZYWqECwlH8wSnlxN_KlCVOzTpbe8",
-  },
-  {
-    id: 2,
-    username: "janedoe",
-    avatar:
-      "https://fastly.picsum.photos/id/26/200/200.jpg?hmac=A1fbIskzMWVQs1JuyIsJXYGuCgqVwevLXT4YaIJM3Rk",
-  },
-  {
-    id: 3,
-    username: "jimdoe",
-    avatar:
-      "https://fastly.picsum.photos/id/669/200/200.jpg?hmac=lAa_bMRK0BRBCTEvl1acVqTfEDrXQc0yNwi683-13cE",
-  },
-];
-type User = (typeof imaginaryUsers)[number];
+// We don't persist avatars for users, so we'll just use a random one
+const AVATAR = "https://i.pravatar.cc/100";
+
+// No sophisticated auth here, just a plain user object in LS
+const LOCALSTORAGE_KEY = "active_user";
 
 export function UserSwitcher() {
-  const [ddOpen, setDdOpen] = React.useState(false);
-  const [signInAs, setSignInAs] = React.useState<User | null>(null);
-  const [user, setUser] = React.useState(imaginaryUsers[0]);
+  const [dropdownOpen, setDropdownOpen] = React.useState(false);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [activeUser, setActiveUser] = React.useState<User | null>(null);
 
-  function handleSignIn(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    if (!signInAs) return;
+  async function fetchUser() {
+    const user = localStorage.getItem(LOCALSTORAGE_KEY);
+    if (!user) return;
 
-    // TODO: validate password
-    // TODO: persist active user in LS or Cookie
-    setUser(signInAs);
-    setSignInAs(null);
+    // check if the user is still valid
+    const res = await fetch(API_URL + "/users/signin", {
+      method: "POST",
+      body: user,
+      headers: { "Content-Type": "application/json" },
+    });
+    const json = await res.json();
+
+    if (res.ok) {
+      setActiveUser(json.user);
+    } else {
+      // user had key in localstorage but the server rejected it
+      localStorage.removeItem(LOCALSTORAGE_KEY);
+      setActiveUser(null);
+      alert("Your session has expired. Please sign in again.");
+    }
   }
 
+  React.useEffect(() => {
+    // Fetch user on mount
+    fetchUser();
+
+    // Setup listerner for changes to localstorage
+    function storageListener(e: StorageEvent) {
+      if (e.key === LOCALSTORAGE_KEY) fetchUser();
+    }
+
+    window.addEventListener("storage", storageListener);
+    return () => window.removeEventListener("storage", storageListener);
+  }, []);
+
   return (
-    <Dialog
-      open={!!signInAs}
-      onOpenChange={(open) => !open && setSignInAs(null)}
-    >
-      <DropdownMenu open={ddOpen} onOpenChange={setDdOpen}>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger asChild>
-          <Button className="p-0 h-10 w-10 rounded-full">
-            <img src={user.avatar} className="rounded-full" />
+          <Button className="p-0 h-10 w-10 rounded-full bg-background hover:bg-background-muted text-foreground">
+            {activeUser ? (
+              <Image
+                src={AVATAR}
+                className="rounded-full"
+                height={100}
+                width={100}
+                priority
+                alt="profile"
+              />
+            ) : (
+              <Icons.User />
+            )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" align="end">
-          <DropdownMenuLabel className="font-semibold">
-            Signed in as: {user.username}
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuLabel className="font-light text-sm text-foreground/80">
-            Select user
-          </DropdownMenuLabel>
-          {imaginaryUsers
-            .filter((u) => u.id !== user.id)
-            .map((user) => (
-              <DialogTrigger asChild>
-                <DropdownMenuItem
-                  key={user.id}
-                  onClick={() => {
-                    setDdOpen(false);
-                    setSignInAs(user);
-                  }}
-                >
-                  <span>{user.username}</span>
-                </DropdownMenuItem>
-              </DialogTrigger>
-            ))}
+          {activeUser && (
+            <>
+              <DropdownMenuLabel className="font-semibold">
+                Hello {activeUser?.username}
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                onClick={() => {
+                  localStorage.removeItem(LOCALSTORAGE_KEY);
+                  setActiveUser(null);
+                }}
+                className="flex justify-between cursor-pointer"
+              >
+                <span>Sign out</span>
+                <Icons.SignOut className="text-foreground/70 h-4" />
+              </DropdownMenuItem>
+            </>
+          )}
+
+          {!activeUser && (
+            <DialogTrigger asChild>
+              <DropdownMenuItem
+                onClick={() => {
+                  setDropdownOpen(false);
+                  setDialogOpen(true);
+                }}
+                className="flex justify-between cursor-pointer"
+              >
+                <span>Sign In</span>
+                <Icons.SignIn />
+              </DropdownMenuItem>
+            </DialogTrigger>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Switch user</DialogTitle>
-          <DialogDescription>
-            <form onSubmit={handleSignIn} className="flex flex-col gap-4 mt-4">
-              <Input placeholder="Password" type="password" />
-              <Button type="submit">Sign in as {signInAs?.username}</Button>
-            </form>
-          </DialogDescription>
-        </DialogHeader>
-      </DialogContent>
+
+      <SignInDialog onSubmitDone={() => setDialogOpen(false)} />
     </Dialog>
+  );
+}
+
+function SignInDialog(props: { onSubmitDone: () => void }) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    // @ts-expect-error - TS doesn't know about submitter ???
+    const isSignUp = e.nativeEvent.submitter.value === "sign-up";
+    const endpoint = isSignUp ? "/users/signup" : "/users/signin";
+
+    const res = await fetch(API_URL + endpoint, {
+      method: "POST",
+      body: JSON.stringify({
+        username: formData.get("username"),
+        password: formData.get("password"), // should be hashed, whatever
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
+    const json = await res.json();
+    if (!res.ok) return alert(json.message);
+
+    // update and send event to trigger eventlisteners
+    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(json.user));
+    window.dispatchEvent(
+      new StorageEvent("storage", { key: LOCALSTORAGE_KEY })
+    );
+
+    // close dialog
+    props.onSubmitDone();
+  }
+
+  return (
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Sign in as</DialogTitle>
+        <DialogDescription>Enter user credentials</DialogDescription>
+        <div className="pt-2">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+            <Input placeholder="Username" type="text" name="username" />
+            <Input placeholder="Password" type="password" name="password" />
+            <Button type="submit" value="sign-in">
+              Sign in
+            </Button>
+            <Button
+              type="submit"
+              value="sign-up"
+              className="bg-transparent text-foreground hover:bg-transparent/80"
+            >
+              Don't have an account? Sign up
+            </Button>
+          </form>
+        </div>
+      </DialogHeader>
+    </DialogContent>
   );
 }
