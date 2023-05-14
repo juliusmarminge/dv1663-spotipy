@@ -1,10 +1,12 @@
 import mysql.connector
 from mysql.connector import Error as MySqlError, errorcode
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, Header
 from setup import config, DB_NAME
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from typing import Annotated, Union
+from json import JSONDecoder
 
 
 app = FastAPI()
@@ -43,11 +45,23 @@ async def songs():
 
 
 @app.get("/playlists")
-async def playlists():
+async def playlists(authorization: Annotated[Union[str, None], Header()] = None):
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
-    cursor.execute("SELECT * FROM playlists")
+
+    try:
+        user = JSONDecoder().decode(authorization)
+    except:
+        user = None
+
+    if user is None:
+        # select all playlists from user 1 (Spotipy) if no authorization header is provided
+        cursor.execute("SELECT * FROM playlists WHERE user_id = 1")
+    else:
+        cursor.execute(
+            "SELECT * FROM playlists WHERE user_id = %s OR user_id = 1", (user["id"],)
+        )
     songs = cursor.fetchall()
     cursor.close()
     cnx.close()
@@ -123,22 +137,6 @@ async def delete_playlist(playlist_id: int):
     print(playlist_id + 1)
 
     return {"message": f"deleted playlist {playlist_id}"}
-
-
-@app.get("/myPlaylists/{user_id}")
-async def playlists(user_id: int):
-    cnx = mysql.connector.connect(**config)
-    cursor = cnx.cursor(dictionary=True)
-    cursor.execute("USE {}".format(DB_NAME))
-    cursor.execute(
-        "SELECT * FROM playlists WHERE user_id = %s",
-        (user_id,),
-    )
-    playlists = cursor.fetchall()
-
-    cursor.close()
-    cnx.close()
-    return playlists
 
 
 class UserPayload(BaseModel):

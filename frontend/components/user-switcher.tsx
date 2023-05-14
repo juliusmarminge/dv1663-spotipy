@@ -23,17 +23,20 @@ import { Input } from "./input";
 import { API_URL } from "~/app/contants";
 import { User } from "~/types/models";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 // We don't persist avatars for users, so we'll just use a random one
 const AVATAR = "https://i.pravatar.cc/100";
 
 // No sophisticated auth here, just a plain user object in LS
 const LOCALSTORAGE_KEY = "active_user";
+const COOKIE_NAME = "x-spotipy-user";
 
 export function UserSwitcher() {
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [activeUser, setActiveUser] = React.useState<User | null>(null);
+  const router = useRouter();
 
   async function fetchUser() {
     const user = localStorage.getItem(LOCALSTORAGE_KEY);
@@ -49,6 +52,8 @@ export function UserSwitcher() {
 
     if (res.ok) {
       setActiveUser(json.user);
+      document.cookie = `${COOKIE_NAME}=${JSON.stringify(json.user)}; path=/;`;
+      router.refresh();
     } else {
       // user had key in localstorage but the server rejected it
       localStorage.removeItem(LOCALSTORAGE_KEY);
@@ -99,8 +104,10 @@ export function UserSwitcher() {
 
               <DropdownMenuItem
                 onClick={() => {
-                  localStorage.removeItem(LOCALSTORAGE_KEY);
                   setActiveUser(null);
+                  localStorage.removeItem(LOCALSTORAGE_KEY);
+                  document.cookie = `${COOKIE_NAME}=; path=/;`;
+                  router.refresh();
                 }}
                 className="flex justify-between cursor-pointer"
               >
