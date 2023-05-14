@@ -110,7 +110,7 @@ export function UserSwitcher() {
                 className="flex justify-between cursor-pointer"
               >
                 <span>Sign out</span>
-                <Icons.SignOut className="text-foreground/70 h-4" />
+                <Icons.SignOut className="text-foreground/80 h-4" />
               </DropdownMenuItem>
             </>
           )}
