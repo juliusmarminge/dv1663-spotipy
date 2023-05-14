@@ -41,13 +41,6 @@ async def songs():
     return songs
 
 
-@app.get("/playlists/{playlist_id}")
-async def playlists(playlist_id: int):
-    print(playlist_id + 1)
-
-    return {"message": playlist_id}
-
-
 @app.get("/playlists")
 async def playlists():
     cnx = mysql.connector.connect(**config)
@@ -80,6 +73,40 @@ async def playlists(playlist: Playlist):
 
     return "Ok"
 
+
+@app.get("/playlists/{playlist_id}")
+async def playlists(playlist_id: int):
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor(dictionary=True)
+    cursor.execute("USE {}".format(DB_NAME))
+    cursor.execute(
+        "SELECT * FROM playlist_songs WHERE playlist_id = %s",
+        (playlist_id,),
+    )
+    playlist_songs = cursor.fetchall()
+    cursor.execute(
+        "SELECT name, user_id FROM playlists WHERE id = %s",
+        (playlist_id,),
+    )
+    playlist_songs.insert(0, cursor.fetchall()[0])
+    cursor.close()
+    cnx.close()
+    return playlist_songs
+
+@app.post("/playlists/{playlist_id}/{song_id}")
+async def playlists(playlist_id: int, song_id: int):
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor(dictionary=True)
+    cursor.execute("USE {}".format(DB_NAME))
+    cursor.execute(
+        "INSERT INTO playlist_songs (playlist_id, song_id) VALUES (%s, %s)",
+        (playlist_id, song_id),
+    )
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+    return "Ok"
 
 @app.put("/playlists/{playlist_id}")
 async def update_playlist(playlist_id: int):
