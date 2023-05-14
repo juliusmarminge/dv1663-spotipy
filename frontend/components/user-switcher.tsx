@@ -31,7 +31,7 @@ const AVATAR = "https://i.pravatar.cc/100";
 const LOCALSTORAGE_KEY = "active_user";
 
 export function UserSwitcher() {
-  const [ddOpen, setDdOpen] = React.useState(false);
+  const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [activeUser, setActiveUser] = React.useState<User | null>(null);
 
@@ -72,7 +72,7 @@ export function UserSwitcher() {
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <DropdownMenu open={ddOpen} onOpenChange={setDdOpen}>
+      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <Button className="p-0 h-10 w-10 rounded-full bg-background hover:bg-background-muted text-foreground">
             {activeUser ? (
@@ -114,7 +114,7 @@ export function UserSwitcher() {
             <DialogTrigger asChild>
               <DropdownMenuItem
                 onClick={() => {
-                  setDdOpen(false);
+                  setDropdownOpen(false);
                   setDialogOpen(true);
                 }}
                 className="flex justify-between cursor-pointer"
