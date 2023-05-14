@@ -1,10 +1,10 @@
 import { Playlist } from "~/types/models";
 import { CreatePlaylistForm } from "~/components/playlist-form";
-import { API_URL, COOKIE_NAME } from "~/app/contants";
+import { API_URL, LS_COOKIE_NAME } from "~/app/contants";
 import { cookies } from "next/headers";
 
 export async function Playlists() {
-  const user = cookies().get(COOKIE_NAME);
+  const user = cookies().get(LS_COOKIE_NAME);
 
   const res2 = await fetch(`${API_URL}/playlists/`, {
     headers: {
