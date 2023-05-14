@@ -51,11 +51,12 @@ export function UserSwitcher() {
       document.cookie = `${LS_COOKIE_NAME}=${JSON.stringify(
         json.user
       )}; path=/;`;
-      router.push("/");
+      router.refresh();
     } else {
       // user had key in localstorage but the server rejected it
       localStorage.removeItem(LS_COOKIE_NAME);
       setActiveUser(null);
+      router.push("/");
       alert("Your session has expired. Please sign in again.");
     }
   }
@@ -106,6 +107,7 @@ export function UserSwitcher() {
                   localStorage.removeItem(LS_COOKIE_NAME);
                   document.cookie = `${LS_COOKIE_NAME}=; path=/;`;
                   router.push("/");
+                  router.refresh();
                 }}
                 className="flex justify-between cursor-pointer"
               >
