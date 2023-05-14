@@ -116,4 +116,11 @@ if __name__ == "__main__":
     for title, artist_name in cursor.fetchall():
         print(f"  {title} by {artist_name}")
 
+    try:
+        print("Testing CreateUser('testuser', 'testpassword')..")
+        cursor.execute("CALL CreateUser('testuser', 'testpassword')")
+        print("Ok")
+    except MySQLError as err:
+        print(err.msg)
+
     cnx.commit()

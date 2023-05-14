@@ -71,6 +71,25 @@ TABLES["users_playlists"] = (
     ")"
 )
 
+procedures = {}
+
+procedures["CreateUser"] = ( # You can apperantly simply use the three quotes instead btw
+    """CREATE PROCEDURE CreateUser(
+	    IN inUsername VARCHAR(255),
+        IN inPassword VARCHAR(255)
+    )
+    BEGIN
+	    DECLARE userID INT;
+        DECLARE playlistID INT;
+    
+        INSERT INTO users (username, password) VALUES (inUsername, inPassword);
+        SELECT LAST_INSERT_ID() INTO userID;
+        INSERT INTO playlists (name, user_id) VALUES ('Liked Songs', userID);
+        SELECT LAST_INSERT_ID() INTO playlistID;
+	    INSERT INTO users_playlists (playlist_id, user_id) VALUES (playlistID, userID);
+    
+    END"""
+)
 
 def create_database(cursor):
     try:
@@ -91,6 +110,13 @@ def create_table(cursor, name, query):
         else:
             print(err.msg)
 
+def create_procedure(cursor, name, query):
+    try:
+        print(f"Creating procedure {name}: ", end="")
+        cursor.execute(query)
+        print("OK")
+    except MySQLError as err:
+        print(err.msg) #dunno what types of errors
 
 if __name__ == "__main__":
     cnx = MySQLConnection(**config)
@@ -111,6 +137,10 @@ if __name__ == "__main__":
     for table_name in TABLES:
         query = TABLES[table_name]
         create_table(cursor, table_name, query)
+
+    for proc_name in procedures:
+        query = procedures[proc_name]
+        create_procedure(cursor, proc_name, query)
 
     cnx.commit()
     cursor.close()
