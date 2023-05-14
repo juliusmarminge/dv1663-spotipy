@@ -4,7 +4,8 @@ const nextConfig = {
     serverActions: true,
   },
   redirects: async () => [
-    { source: "/", destination: "/playlist/toplist", permanent: true },
+    { source: "/", destination: "/playlist/1", permanent: true },
+    { source: "/playlist", destination: "/playlist/1", permanent: true },
   ],
   images: {
     remotePatterns: [{ protocol: "https", hostname: "i.pravatar.cc" }],
