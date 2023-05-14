@@ -15,6 +15,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSeparator,
 } from "~/components/dropdown-menu";
+import Link from "next/link";
 
 export function SongCard(props: Song & { idx: number; artist_name: string }) {
   const { song, setSong } = useCurrentSong();
@@ -64,7 +65,12 @@ export function SongCard(props: Song & { idx: number; artist_name: string }) {
         >
           {props.title}
         </h1>
-        <h2 className="hover:underline cursor-pointer">{props.artist_name}</h2>
+        <Link
+          href={`/artist/${props.artist_id}`}
+          className="hover:underline cursor-pointer"
+        >
+          {props.artist_name}
+        </Link>
       </div>
 
       <SongActions songId={props.id} />
