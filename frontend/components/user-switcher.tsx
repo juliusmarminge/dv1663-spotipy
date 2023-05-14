@@ -20,17 +20,13 @@ import {
   DialogTrigger,
 } from "./dialog";
 import { Input } from "./input";
-import { API_URL } from "~/app/contants";
+import { API_URL, COOKIE_NAME, LOCALSTORAGE_KEY } from "~/app/contants";
 import { User } from "~/types/models";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 // We don't persist avatars for users, so we'll just use a random one
 const AVATAR = "https://i.pravatar.cc/100";
-
-// No sophisticated auth here, just a plain user object in LS
-const LOCALSTORAGE_KEY = "active_user";
-const COOKIE_NAME = "x-spotipy-user";
 
 export function UserSwitcher() {
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
