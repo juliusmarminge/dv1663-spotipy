@@ -32,11 +32,12 @@ async def root():
 
 @app.get("/songs")
 async def songs():
+    """Get all songs"""
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
     cursor.execute(
-        "SELECT songs.*, artists.name as name FROM songs INNER JOIN artists ON songs.artist_id = artists.id"
+        "SELECT songs.*, artists.name as artist FROM songs INNER JOIN artists ON songs.artist_id = artists.id"
     )
     songs = cursor.fetchall()
     cursor.close()
@@ -46,6 +47,7 @@ async def songs():
 
 @app.get("/playlists")
 async def playlists(authorization: Annotated[Union[str, None], Header()] = None):
+    """Get all playlists"""
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
@@ -75,6 +77,7 @@ class Playlist(BaseModel):
 
 @app.post("/playlists")
 async def playlists(playlist: Playlist):
+    """Create a new playlist."""
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
@@ -85,12 +88,12 @@ async def playlists(playlist: Playlist):
     cnx.commit()
     cursor.close()
     cnx.close()
-
     return "Ok"
 
 
 @app.get("/playlists/{playlist_id}")
 async def playlists(playlist_id: int):
+    """Get all songs from the playlist with the playlist_id."""
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
@@ -109,22 +112,6 @@ async def playlists(playlist_id: int):
     return playlist_songs
 
 
-@app.post("/playlists/{playlist_id}/{song_id}")
-async def playlists(playlist_id: int, song_id: int):
-    cnx = mysql.connector.connect(**config)
-    cursor = cnx.cursor(dictionary=True)
-    cursor.execute("USE {}".format(DB_NAME))
-    cursor.execute(
-        "INSERT INTO playlist_songs (playlist_id, song_id) VALUES (%s, %s)",
-        (playlist_id, song_id),
-    )
-    cnx.commit()
-    cursor.close()
-    cnx.close()
-
-    return "Ok"
-
-
 @app.put("/playlists/{playlist_id}")
 async def update_playlist(playlist_id: int):
     print(playlist_id + 1)
@@ -137,6 +124,23 @@ async def delete_playlist(playlist_id: int):
     print(playlist_id + 1)
 
     return {"message": f"deleted playlist {playlist_id}"}
+
+
+@app.post("/playlists/{playlist_id}/{song_id}")
+async def playlists(playlist_id: int, song_id: int):
+    """Put a song with song_id into a playlist with playlist_id"""
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor(dictionary=True)
+    cursor.execute("USE {}".format(DB_NAME))
+    cursor.execute(
+        "INSERT INTO playlist_songs (playlist_id, song_id) VALUES (%s, %s)",
+        (playlist_id, song_id),
+    )
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+    return "Ok"
 
 
 class UserPayload(BaseModel):
