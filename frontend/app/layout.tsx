@@ -19,7 +19,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-screen">
       <body className={twMerge(inter.variable, "font-sans")}>
         <div className="container mx-auto relative h-screen">
           <div className="flex justify-between items-center pt-12 pb-6">

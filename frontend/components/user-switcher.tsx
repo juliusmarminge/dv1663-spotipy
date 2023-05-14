@@ -51,7 +51,7 @@ export function UserSwitcher() {
       document.cookie = `${LS_COOKIE_NAME}=${JSON.stringify(
         json.user
       )}; path=/;`;
-      router.refresh();
+      router.push("/");
     } else {
       // user had key in localstorage but the server rejected it
       localStorage.removeItem(LS_COOKIE_NAME);
@@ -105,7 +105,7 @@ export function UserSwitcher() {
                   setActiveUser(null);
                   localStorage.removeItem(LS_COOKIE_NAME);
                   document.cookie = `${LS_COOKIE_NAME}=; path=/;`;
-                  router.refresh();
+                  router.push("/");
                 }}
                 className="flex justify-between cursor-pointer"
               >
