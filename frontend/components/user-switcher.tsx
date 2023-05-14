@@ -40,7 +40,7 @@ export function UserSwitcher() {
     if (!user) return;
 
     // check if the user is still valid
-    const res = await fetch(API_URL + "/users/login", {
+    const res = await fetch(API_URL + "/users/signin", {
       method: "POST",
       body: user,
       headers: { "Content-Type": "application/json" },
