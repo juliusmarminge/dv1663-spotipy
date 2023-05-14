@@ -27,7 +27,7 @@ import Image from "next/image";
 // We don't persist avatars for users, so we'll just use a random one
 const AVATAR = "https://i.pravatar.cc/100";
 
-// No sophisticated auth here, just a username stored in LS
+// No sophisticated auth here, just a plain user object in LS
 const LOCALSTORAGE_KEY = "active_user";
 
 export function UserSwitcher() {
@@ -35,38 +35,37 @@ export function UserSwitcher() {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [activeUser, setActiveUser] = React.useState<User | null>(null);
 
-  React.useEffect(() => {
-    async function fetchUser() {
-      const user = localStorage.getItem(LOCALSTORAGE_KEY);
+  async function fetchUser() {
+    const user = localStorage.getItem(LOCALSTORAGE_KEY);
+    if (!user) return;
 
-      if (user) {
-        // check if the user is still valid
-        await fetch(API_URL + "/users/login", {
-          method: "POST",
-          body: user,
-          headers: { "Content-Type": "application/json" },
-        }).then(async (res) => {
-          const json = await res.json();
-          if (res.ok) {
-            setActiveUser(json.user);
-          } else {
-            // user had key in localstorage but the server rejected it
-            localStorage.removeItem(LOCALSTORAGE_KEY);
-            setActiveUser(null);
-            alert("Your session has expired. Please sign in again.");
-          }
-        });
-      }
+    // check if the user is still valid
+    const res = await fetch(API_URL + "/users/login", {
+      method: "POST",
+      body: user,
+      headers: { "Content-Type": "application/json" },
+    });
+    const json = await res.json();
+
+    if (res.ok) {
+      setActiveUser(json.user);
+    } else {
+      // user had key in localstorage but the server rejected it
+      localStorage.removeItem(LOCALSTORAGE_KEY);
+      setActiveUser(null);
+      alert("Your session has expired. Please sign in again.");
     }
+  }
 
+  React.useEffect(() => {
+    // Fetch user on mount
     fetchUser();
 
     // Setup listerner for changes to localstorage
     function storageListener(e: StorageEvent) {
-      if (e.key === LOCALSTORAGE_KEY) {
-        fetchUser();
-      }
+      if (e.key === LOCALSTORAGE_KEY) fetchUser();
     }
+
     window.addEventListener("storage", storageListener);
     return () => window.removeEventListener("storage", storageListener);
   }, []);
@@ -139,7 +138,7 @@ function SignInDialog(props: { onSubmitDone: () => void }) {
     const formData = new FormData(e.currentTarget);
     // @ts-expect-error - TS doesn't know about submitter ???
     const isSignUp = e.nativeEvent.submitter.value === "sign-up";
-    const endpoint = isSignUp ? "/users" : "/users/login";
+    const endpoint = isSignUp ? "/users/signup" : "/users/signin";
 
     const res = await fetch(API_URL + endpoint, {
       method: "POST",
@@ -152,11 +151,13 @@ function SignInDialog(props: { onSubmitDone: () => void }) {
     const json = await res.json();
     if (!res.ok) return alert(json.message);
 
+    // update and send event to trigger eventlisteners
     window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(json.user));
-    // send event to trigger eventlisteners
     window.dispatchEvent(
       new StorageEvent("storage", { key: LOCALSTORAGE_KEY })
     );
+
+    // close dialog
     props.onSubmitDone();
   }
 

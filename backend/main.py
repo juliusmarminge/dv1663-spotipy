@@ -147,7 +147,7 @@ class UserPayload(BaseModel):
     password: str
 
 
-@app.post("/users")
+@app.post("/users/signup")
 async def create_user(body: UserPayload, response: Response):
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
@@ -170,12 +170,10 @@ async def create_user(body: UserPayload, response: Response):
             return {"message": "Unknown error"}
 
     response.status_code = 201
-
-    print(user)
     return {"message": "ok", "user": user}
 
 
-@app.post("/users/login")
+@app.post("/users/signin")
 async def login_user(body: UserPayload, response: Response):
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
@@ -185,9 +183,10 @@ async def login_user(body: UserPayload, response: Response):
         (body.username, body.password),
     )
     user = cursor.fetchone()
+
     if user is None:
         response.status_code = 401
         return {"message": "Invalid credentials"}
-    response.status_code = 200
 
+    response.status_code = 200
     return {"message": "ok", "user": user}
