@@ -1,4 +1,3 @@
-import { Icon } from "next/dist/lib/metadata/types/metadata-types";
 import { twMerge } from "tailwind-merge";
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {}
