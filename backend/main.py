@@ -1,5 +1,6 @@
 import mysql.connector
-from fastapi import FastAPI
+from mysql.connector import Error as MySqlError, errorcode
+from fastapi import FastAPI, Response
 from setup import config, DB_NAME
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -93,6 +94,7 @@ async def playlists(playlist_id: int):
     cnx.close()
     return playlist_songs
 
+
 @app.post("/playlists/{playlist_id}/{song_id}")
 async def playlists(playlist_id: int, song_id: int):
     cnx = mysql.connector.connect(**config)
@@ -108,6 +110,7 @@ async def playlists(playlist_id: int, song_id: int):
 
     return "Ok"
 
+
 @app.put("/playlists/{playlist_id}")
 async def update_playlist(playlist_id: int):
     print(playlist_id + 1)
@@ -120,6 +123,7 @@ async def delete_playlist(playlist_id: int):
     print(playlist_id + 1)
 
     return {"message": f"deleted playlist {playlist_id}"}
+
 
 @app.get("/myPlaylists/{user_id}")
 async def playlists(user_id: int):
@@ -135,3 +139,54 @@ async def playlists(user_id: int):
     cursor.close()
     cnx.close()
     return playlists
+
+
+class UserPayload(BaseModel):
+    id: int = None
+    username: str
+    password: str
+
+
+@app.post("/users/signup")
+async def create_user(body: UserPayload, response: Response):
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor(dictionary=True)
+    cursor.execute("USE {}".format(DB_NAME))
+    try:
+        cursor.execute(
+            "CALL CreateUser(%s, %s)",
+            (body.username, body.password),
+        )
+        cursor.execute("SELECT * FROM users WHERE username = %s", (body.username,))
+        user = cursor.fetchone()
+        cnx.commit()
+    except MySqlError as err:
+        if err.errno == errorcode.ER_DUP_ENTRY:
+            response.status_code = 409
+            return {"message": "User already exists"}
+        else:
+            print(err)
+            response.status_code = 500
+            return {"message": "Unknown error"}
+
+    response.status_code = 201
+    return {"message": "ok", "user": user}
+
+
+@app.post("/users/signin")
+async def login_user(body: UserPayload, response: Response):
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor(dictionary=True)
+    cursor.execute("USE {}".format(DB_NAME))
+    cursor.execute(
+        "SELECT * FROM users WHERE username = %s AND password = %s",
+        (body.username, body.password),
+    )
+    user = cursor.fetchone()
+
+    if user is None:
+        response.status_code = 401
+        return {"message": "Invalid credentials"}
+
+    response.status_code = 200
+    return {"message": "ok", "user": user}
