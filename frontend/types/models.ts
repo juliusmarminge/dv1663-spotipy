@@ -7,7 +7,7 @@ export interface Artist {
 export interface Song {
   id: number;
   title: string;
-  artist_id: string;
+  artist_id: number;
   mp3_path: string;
   cover_path: string;
 }

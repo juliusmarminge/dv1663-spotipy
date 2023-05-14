@@ -73,12 +73,12 @@ export function SongCard(props: Song & { idx: number; artist_name: string }) {
         </Link>
       </div>
 
-      <SongActions songId={props.id} />
+      <SongActions songId={props.id} artistId={props.artist_id} />
     </div>
   );
 }
 
-function SongActions(props: { songId: Song["id"] }) {
+function SongActions(props: { songId: Song["id"]; artistId: Artist["id"] }) {
   const addToPlaylist = (playlistName: string) => {
     console.log(`${props.songId} added to ${playlistName}`);
   };
@@ -89,7 +89,9 @@ function SongActions(props: { songId: Song["id"] }) {
         <Icons.More className="hidden group-hover:block" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[225px]">
-        <DropdownMenuItem disabled>Go to artist</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href={`/artist/${props.artistId}`}>Go to artist</Link>
+        </DropdownMenuItem>
         <DropdownMenuItem disabled>Go to album</DropdownMenuItem>
 
         <DropdownMenuSeparator />
