@@ -1,3 +1,4 @@
+import { Icon } from "next/dist/lib/metadata/types/metadata-types";
 import { twMerge } from "tailwind-merge";
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {}
@@ -139,6 +140,56 @@ export function Pause(props: IconProps) {
         strokeLinejoin="round"
         d="M15.75 5.25v13.5m-7.5-13.5v13.5"
       />
+    </svg>
+  );
+}
+
+export function SignIn(props: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={twMerge("h-6 fill-none stroke-current", props.className)}
+    >
+      <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+      <polyline points="10 17 15 12 10 7"></polyline>
+      <line x1="15" x2="3" y1="12" y2="12"></line>
+    </svg>
+  );
+}
+
+export function SignOut(props: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={twMerge("h-6 fill-none stroke-current", props.className)}
+    >
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+      <polyline points="16 17 21 12 16 7"></polyline>
+      <line x1="21" x2="9" y1="12" y2="12"></line>
+    </svg>
+  );
+}
+
+export function User(props: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={twMerge("h-6 fill-none stroke-current", props.className)}
+    >
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+      <circle cx="12" cy="7" r="4"></circle>
     </svg>
   );
 }
