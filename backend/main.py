@@ -120,3 +120,18 @@ async def delete_playlist(playlist_id: int):
     print(playlist_id + 1)
 
     return {"message": f"deleted playlist {playlist_id}"}
+
+@app.get("/myPlaylists/{user_id}")
+async def playlists(user_id: int):
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor(dictionary=True)
+    cursor.execute("USE {}".format(DB_NAME))
+    cursor.execute(
+        "SELECT * FROM playlists WHERE user_id = %s",
+        (user_id,),
+    )
+    playlists = cursor.fetchall()
+
+    cursor.close()
+    cnx.close()
+    return playlists
