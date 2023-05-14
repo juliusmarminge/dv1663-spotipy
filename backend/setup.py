@@ -61,16 +61,6 @@ TABLES["playlist_songs"] = (
     ")"
 )
 
-TABLES["users_playlists"] = (
-    "CREATE TABLE `users_playlists` ("
-    "  `playlist_id` int NOT NULL,"
-    "  `user_id` int NOT NULL,"
-    "  PRIMARY KEY (`playlist_id`),"  # one-to-many - a playlist is only created by one user
-    "  FOREIGN KEY (`playlist_id`) REFERENCES `playlists` (`id`),"
-    "  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)"
-    ")"
-)
-
 procedures = {}
 
 procedures["CreateUser"] = ( # You can apperantly simply use the three quotes instead btw
@@ -80,13 +70,10 @@ procedures["CreateUser"] = ( # You can apperantly simply use the three quotes in
     )
     BEGIN
 	    DECLARE userID INT;
-        DECLARE playlistID INT;
     
         INSERT INTO users (username, password) VALUES (inUsername, inPassword);
         SELECT LAST_INSERT_ID() INTO userID;
         INSERT INTO playlists (name, user_id) VALUES ('Liked Songs', userID);
-        SELECT LAST_INSERT_ID() INTO playlistID;
-	    INSERT INTO users_playlists (playlist_id, user_id) VALUES (playlistID, userID);
     
     END"""
 )

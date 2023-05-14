@@ -75,13 +75,11 @@ def initialize_toplist(cursor):
         query = f"INSERT INTO playlists (name, user_id) VALUES ('Global Top Songs', {user_id})"
         print("Creating Global Top Songs playlist: ", end="")
         cursor.execute(query)
-        playlist_id = cursor.lastrowid
-        query = f"INSERT INTO users_playlists (user_id, playlist_id) VALUES ({user_id}, {playlist_id})"
-        cursor.execute(query)
         print("OK")
     except MySQLError as err:
         print(err)
 
+    playlist_id = cursor.lastrowid
     # Add songs to playlist
     for song_id in range(1, len(SONGS) + 1):
         try:
