@@ -1,10 +1,12 @@
 import mysql.connector
 from mysql.connector import Error as MySqlError, errorcode
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, Header
 from setup import config, DB_NAME
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from typing import Annotated, Union
+from json import JSONDecoder
 
 
 app = FastAPI()
@@ -43,14 +45,23 @@ async def songs():
     return songs
 
 
-@app.get("/playlists") 
-async def playlists():
+@app.get("/playlists")
+async def playlists(authorization: Annotated[Union[str, None], Header()] = None):
     """Get all playlists"""
-
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
-    cursor.execute("SELECT * FROM playlists")
+
+    try:
+        user = JSONDecoder().decode(authorization)
+        # select all public (from Spotipy) + private playlists from the user
+        cursor.execute(
+            "SELECT * FROM playlists WHERE user_id = %s OR user_id = 1", (user["id"],)
+        )
+    except:
+        # select only public playlists from user 1 (Spotipy) if no authorization header is provided
+        cursor.execute("SELECT * FROM playlists WHERE user_id = 1")
+
     songs = cursor.fetchall()
     cursor.close()
     cnx.close()
@@ -98,6 +109,7 @@ async def playlists(playlist_id: int):
     cnx.close()
     return playlist_songs
 
+
 @app.put("/playlists/{playlist_id}")
 async def update_playlist(playlist_id: int):
     print(playlist_id + 1)
@@ -110,6 +122,7 @@ async def delete_playlist(playlist_id: int):
     print(playlist_id + 1)
 
     return {"message": f"deleted playlist {playlist_id}"}
+
 
 @app.post("/playlists/{playlist_id}/{song_id}")
 async def playlists(playlist_id: int, song_id: int):
@@ -126,22 +139,6 @@ async def playlists(playlist_id: int, song_id: int):
     cnx.close()
 
     return "Ok"
-
-@app.get("/myPlaylists/{user_id}")
-async def playlists(user_id: int):
-    """Get all playlists created by user user_id"""
-    cnx = mysql.connector.connect(**config)
-    cursor = cnx.cursor(dictionary=True)
-    cursor.execute("USE {}".format(DB_NAME))
-    cursor.execute(
-        "SELECT * FROM playlists WHERE user_id = %s",
-        (user_id,),
-    )
-    playlists = cursor.fetchall()
-
-    cursor.close()
-    cnx.close()
-    return playlists
 
 
 class UserPayload(BaseModel):

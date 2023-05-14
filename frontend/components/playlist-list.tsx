@@ -1,9 +1,18 @@
 import { Playlist } from "~/types/models";
 import { CreatePlaylistForm } from "~/components/playlist-form";
-import { API_URL } from "~/app/contants";
+import { API_URL, LS_COOKIE_NAME } from "~/app/contants";
+import { cookies } from "next/headers";
 
 export async function Playlists() {
-  const res2 = await fetch(`${API_URL}/playlists`);
+  const user = cookies().get(LS_COOKIE_NAME);
+
+  const res2 = await fetch(`${API_URL}/playlists/`, {
+    headers: {
+      "Content-Type": "application/json",
+      // append the current user if they're logged in
+      ...(user ? { Authorization: user?.value } : {}),
+    },
+  });
   const playlists = (await res2.json()) as Playlist[];
 
   return (

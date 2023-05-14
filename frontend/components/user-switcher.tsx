@@ -20,23 +20,22 @@ import {
   DialogTrigger,
 } from "./dialog";
 import { Input } from "./input";
-import { API_URL } from "~/app/contants";
+import { API_URL, LS_COOKIE_NAME } from "~/app/contants";
 import { User } from "~/types/models";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 // We don't persist avatars for users, so we'll just use a random one
 const AVATAR = "https://i.pravatar.cc/100";
-
-// No sophisticated auth here, just a plain user object in LS
-const LOCALSTORAGE_KEY = "active_user";
 
 export function UserSwitcher() {
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [activeUser, setActiveUser] = React.useState<User | null>(null);
+  const router = useRouter();
 
   async function fetchUser() {
-    const user = localStorage.getItem(LOCALSTORAGE_KEY);
+    const user = localStorage.getItem(LS_COOKIE_NAME);
     if (!user) return;
 
     // check if the user is still valid
@@ -49,9 +48,13 @@ export function UserSwitcher() {
 
     if (res.ok) {
       setActiveUser(json.user);
+      document.cookie = `${LS_COOKIE_NAME}=${JSON.stringify(
+        json.user
+      )}; path=/;`;
+      router.refresh();
     } else {
       // user had key in localstorage but the server rejected it
-      localStorage.removeItem(LOCALSTORAGE_KEY);
+      localStorage.removeItem(LS_COOKIE_NAME);
       setActiveUser(null);
       alert("Your session has expired. Please sign in again.");
     }
@@ -63,7 +66,7 @@ export function UserSwitcher() {
 
     // Setup listerner for changes to localstorage
     function storageListener(e: StorageEvent) {
-      if (e.key === LOCALSTORAGE_KEY) fetchUser();
+      if (e.key === LS_COOKIE_NAME) fetchUser();
     }
 
     window.addEventListener("storage", storageListener);
@@ -99,8 +102,10 @@ export function UserSwitcher() {
 
               <DropdownMenuItem
                 onClick={() => {
-                  localStorage.removeItem(LOCALSTORAGE_KEY);
                   setActiveUser(null);
+                  localStorage.removeItem(LS_COOKIE_NAME);
+                  document.cookie = `${LS_COOKIE_NAME}=; path=/;`;
+                  router.refresh();
                 }}
                 className="flex justify-between cursor-pointer"
               >
@@ -152,10 +157,8 @@ function SignInDialog(props: { onSubmitDone: () => void }) {
     if (!res.ok) return alert(json.message);
 
     // update and send event to trigger eventlisteners
-    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(json.user));
-    window.dispatchEvent(
-      new StorageEvent("storage", { key: LOCALSTORAGE_KEY })
-    );
+    window.localStorage.setItem(LS_COOKIE_NAME, JSON.stringify(json.user));
+    window.dispatchEvent(new StorageEvent("storage", { key: LS_COOKIE_NAME }));
 
     // close dialog
     props.onSubmitDone();
