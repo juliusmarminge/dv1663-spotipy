@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
 } from "~/components/dropdown-menu";
 
-export function SongCard(props: Song & { idx: number } & Artist) {
+export function SongCard(props: Song & { idx: number; artist_name: string }) {
   const { song, setSong } = useCurrentSong();
   const { isPlaying, setIsPlaying } = useIsPlaying();
 
@@ -35,7 +35,7 @@ export function SongCard(props: Song & { idx: number } & Artist) {
             setSong({
               id: props.id,
               title: props.title,
-              artist_name: props.name,
+              artist_name: props.artist_name,
               cover_path: props.cover_path,
               mp3_path: props.mp3_path,
             });
@@ -64,7 +64,7 @@ export function SongCard(props: Song & { idx: number } & Artist) {
         >
           {props.title}
         </h1>
-        <h2 className="hover:underline cursor-pointer">{props.name}</h2>
+        <h2 className="hover:underline cursor-pointer">{props.artist_name}</h2>
       </div>
 
       <SongActions songId={props.id} />

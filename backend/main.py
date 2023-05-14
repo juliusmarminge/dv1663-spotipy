@@ -47,7 +47,7 @@ async def songs():
 
 @app.get("/playlists")
 async def playlists(authorization: Annotated[Union[str, None], Header()] = None):
-    """Get all playlists"""
+    """Get all public playlists. Include private playlists if authorization header is provided."""
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
@@ -68,20 +68,30 @@ async def playlists(authorization: Annotated[Union[str, None], Header()] = None)
     return songs
 
 
-class Playlist(BaseModel):
+class CreatePlaylistPayload(BaseModel):
     name: str
-    user_id: int
 
 
 @app.post("/playlists")
-async def playlists(playlist: Playlist):
+async def playlists(
+    body: CreatePlaylistPayload,
+    response: Response,
+    authorization: Annotated[Union[str, None], Header()] = None,
+):
     """Create a new playlist."""
+    try:
+        user = JSONDecoder().decode(authorization)
+        print(user)
+    except:
+        response.status_code = 401
+        return {"message": "Not authorized"}
+
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
     cursor.execute(
         "INSERT INTO playlists (name, user_id) VALUES (%s, %s)",
-        (playlist.name, playlist.user_id),
+        (body.name, user["id"]),
     )
     cnx.commit()
     cursor.close()
@@ -90,24 +100,36 @@ async def playlists(playlist: Playlist):
 
 
 @app.get("/playlists/{playlist_id}")
-async def playlists(playlist_id: int):
+async def playlists(playlist_id: int, response: Response):
     """Get all songs from the playlist with the playlist_id."""
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
-    cursor.execute(
-        "SELECT * FROM playlist_songs WHERE playlist_id = %s",
-        (playlist_id,),
-    )
-    playlist_songs = cursor.fetchall()
+
     cursor.execute(
         "SELECT name, user_id FROM playlists WHERE id = %s",
         (playlist_id,),
     )
-    playlist_songs.insert(0, cursor.fetchall()[0])
+    playlist = cursor.fetchone()
+
+    if playlist is None:
+        response.status_code = 404
+        return {"message": "Playlist not found"}
+
+    cursor.execute(
+        "SELECT S.*, A.name as artist_name FROM playlist_songs PS "
+        "   INNER JOIN songs S ON PS.song_id = S.id "
+        "   INNER JOIN artists A ON S.artist_id = A.id "
+        "WHERE playlist_id = %s",
+        (playlist_id,),
+    )
+    songs = cursor.fetchall()
+    playlist["songs"] = songs
+
     cursor.close()
     cnx.close()
-    return playlist_songs
+
+    return playlist
 
 
 @app.put("/playlists/{playlist_id}")
