@@ -54,16 +54,14 @@ async def playlists(authorization: Annotated[Union[str, None], Header()] = None)
 
     try:
         user = JSONDecoder().decode(authorization)
-    except:
-        user = None
-
-    if user is None:
-        # select all playlists from user 1 (Spotipy) if no authorization header is provided
-        cursor.execute("SELECT * FROM playlists WHERE user_id = 1")
-    else:
+        # select all public (from Spotipy) + private playlists from the user
         cursor.execute(
             "SELECT * FROM playlists WHERE user_id = %s OR user_id = 1", (user["id"],)
         )
+    except:
+        # select only public playlists from user 1 (Spotipy) if no authorization header is provided
+        cursor.execute("SELECT * FROM playlists WHERE user_id = 1")
+
     songs = cursor.fetchall()
     cursor.close()
     cnx.close()
