@@ -25,28 +25,8 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/songs")
-async def songs():
-    """Get all songs"""
-    cnx = mysql.connector.connect(**config)
-    cursor = cnx.cursor(dictionary=True)
-    cursor.execute("USE {}".format(DB_NAME))
-    cursor.execute(
-        "SELECT songs.*, artists.name as artist FROM songs INNER JOIN artists ON songs.artist_id = artists.id"
-    )
-    songs = cursor.fetchall()
-    cursor.close()
-    cnx.close()
-    return songs
-
-
 @app.get("/playlists")
-async def playlists(authorization: Annotated[Union[str, None], Header()] = None):
+async def get_playlists(authorization: Annotated[Union[str, None], Header()] = None):
     """Get all public playlists. Include private playlists if authorization header is provided."""
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
@@ -73,12 +53,12 @@ class CreatePlaylistPayload(BaseModel):
 
 
 @app.post("/playlists")
-async def playlists(
+async def create_playlist(
     body: CreatePlaylistPayload,
     response: Response,
     authorization: Annotated[Union[str, None], Header()] = None,
 ):
-    """Create a new playlist."""
+    """Create a new playlist for an authenticated user."""
     try:
         user = JSONDecoder().decode(authorization)
         print(user)
@@ -100,14 +80,16 @@ async def playlists(
 
 
 @app.get("/playlists/{playlist_id}")
-async def playlists(playlist_id: int, response: Response):
+async def get_playlist(playlist_id: int, response: Response):
     """Get all songs from the playlist with the playlist_id."""
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
 
     cursor.execute(
-        "SELECT name, user_id FROM playlists WHERE id = %s",
+        "SELECT name, user_id, username FROM playlists P "
+        "   INNER JOIN users U ON P.user_id = U.id "
+        "WHERE P.id = %s",
         (playlist_id,),
     )
     playlist = cursor.fetchone()
@@ -132,13 +114,6 @@ async def playlists(playlist_id: int, response: Response):
     return playlist
 
 
-@app.put("/playlists/{playlist_id}")
-async def update_playlist(playlist_id: int):
-    print(playlist_id + 1)
-
-    return {"message": f"updating playlist {playlist_id}"}
-
-
 @app.delete("/playlists/{playlist_id}")
 async def delete_playlist(playlist_id: int):
     print(playlist_id + 1)
@@ -146,8 +121,8 @@ async def delete_playlist(playlist_id: int):
     return {"message": f"deleted playlist {playlist_id}"}
 
 
-@app.post("/playlists/{playlist_id}/{song_id}")
-async def playlists(playlist_id: int, song_id: int):
+@app.put("/playlists/{playlist_id}/{song_id}")
+async def add_song_to_playlist(playlist_id: int, song_id: int):
     """Put a song with song_id into a playlist with playlist_id"""
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
@@ -171,6 +146,7 @@ class UserPayload(BaseModel):
 
 @app.post("/users/signup")
 async def create_user(body: UserPayload, response: Response):
+    """Signs up a new user. Uses the `CreateUser` procedure to create a new user and give them a default playlist for their liked songs."""
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
@@ -197,6 +173,7 @@ async def create_user(body: UserPayload, response: Response):
 
 @app.post("/users/signin")
 async def login_user(body: UserPayload, response: Response):
+    """Signs in a user by checking if the username and password match. No hashing or other security measures are taken, out of scope for this project."""
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
