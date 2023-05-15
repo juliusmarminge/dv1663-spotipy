@@ -9,6 +9,7 @@ export const dynamic = "force-dynamic";
 type PlaylistResponse = {
   id: string;
   name: string;
+  owner: string;
   songs: (Song & { artist_name: string })[];
 };
 
@@ -29,7 +30,10 @@ export default async function Home(props: { params: { id: string } }) {
 
   return (
     <div className="flex flex-col gap-2 overflow-scroll p-4">
-      <h2 className="text-2xl font-bold">{playlist.name}</h2>
+      <div>
+        <h2 className="text-2xl font-bold">{playlist.name}</h2>
+        <p className="text-foreground/80">by {playlist.owner}</p>
+      </div>
       <div className="flex flex-col overflow-scroll">
         {playlist.songs.length === 0 && (
           <>

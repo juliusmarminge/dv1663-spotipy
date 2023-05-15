@@ -87,7 +87,7 @@ async def get_playlist(playlist_id: int, response: Response):
     cursor.execute("USE {}".format(DB_NAME))
 
     cursor.execute(
-        "SELECT name, user_id, username FROM playlists P "
+        "SELECT P.name, U.username as owner FROM playlists P "
         "   INNER JOIN users U ON P.user_id = U.id "
         "WHERE P.id = %s",
         (playlist_id,),
