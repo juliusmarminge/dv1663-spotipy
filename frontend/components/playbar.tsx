@@ -101,7 +101,7 @@ export function Playbar() {
 
       {/** Seekbar */}
       <div className="flex gap-2 flex-1 w-full max-w-2xl">
-        <span className="text-sm text-foreground/80 mr-2">
+        <span className="text-sm text-foreground/80 mr-2 tabular-nums">
           {formatDuration(progress)}
         </span>
         <audio
@@ -128,7 +128,7 @@ export function Playbar() {
           max={duration}
           step={0.01}
         />
-        <span className="text-sm text-foreground/80 ml-2">
+        <span className="text-sm text-foreground/80 ml-2 tabular-nums">
           {formatDuration(duration)}
         </span>
       </div>
