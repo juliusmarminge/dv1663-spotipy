@@ -103,7 +103,10 @@ def create_procedure(cursor, name, query):
         cursor.execute(query)
         print("OK")
     except MySQLError as err:
-        print(err.msg) #dunno what types of errors
+        if err.errno == errorcode.ER_SP_ALREADY_EXISTS:
+            print("already exists.")
+        else:
+            print(err.msg)
 
 if __name__ == "__main__":
     cnx = MySQLConnection(**config)
