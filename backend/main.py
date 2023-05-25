@@ -54,7 +54,7 @@ class CreatePlaylistPayload(BaseModel):
 
 @app.post("/playlists")
 async def create_playlist(
-    body: CreatePlaylistPayload,
+    body: CreatePlaylistPayload, # why is this needed?
     response: Response,
     authorization: Annotated[Union[str, None], Header()] = None,
 ):
@@ -115,10 +115,37 @@ async def get_playlist(playlist_id: int, response: Response):
 
 
 @app.delete("/playlists/{playlist_id}")
-async def delete_playlist(playlist_id: int):
-    print(playlist_id + 1)
+async def delete_playlist( #TODO: maybe a mysql function that verifes user password? and a trigger that removes playlist songs.
+    playlist_id: int,
+    response: Response,
+    authorization: Annotated[Union[str, None], Header()] = None, # auth is a must.
+):
+    """Delete a playlist for an authenticated user"""
 
-    return {"message": f"deleted playlist {playlist_id}"}
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor(dictionary=True)
+    cursor.execute("USE {}".format(DB_NAME))
+
+    try:
+        user = JSONDecoder().decode(authorization)
+        print(user)
+    except:
+        response.status_code = 401
+        return {"message": "Not authorized"}
+
+    if(user['id'] == 1): # if admin, he can delete any.
+        cursor.execute(
+            "DELETE FROM playlists WHERE id = %s", (playlist_id,),
+            )
+    else:
+        cursor.execute(
+            "DELETE FROM playlists WHERE id = %s AND user_id = %s", (playlist_id, user['id'],),
+        )
+
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+    return "Ok"
 
 
 @app.put("/playlists/{playlist_id}/{song_id}")
