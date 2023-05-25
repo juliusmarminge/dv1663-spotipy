@@ -115,7 +115,7 @@ async def get_playlist(playlist_id: int, response: Response):
 
 
 @app.delete("/playlists/{playlist_id}")
-async def delete_playlist( #TODO: maybe a mysql function that verifes user password? and a trigger that removes playlist songs.
+async def delete_playlist( #TODO: and a trigger that removes playlist songs.
     playlist_id: int,
     response: Response,
     authorization: Annotated[Union[str, None], Header()] = None, # auth is a must.
@@ -128,19 +128,27 @@ async def delete_playlist( #TODO: maybe a mysql function that verifes user passw
 
     try:
         user = JSONDecoder().decode(authorization)
-        print(user)
+        cursor.execute("SELECT VerifyUser(%s, NULL, %s)", (user['id'], user['password'],),)
+        dict = cursor.fetchone()
+        bool = list(dict.values())[0] # gets the element in the dict, which is 1 if user is verified
+        if not bool:
+            raise Exception
     except:
         response.status_code = 401
         return {"message": "Not authorized"}
-
+    
     if(user['id'] == 1): # if admin, he can delete any.
         cursor.execute(
-            "DELETE FROM playlists WHERE id = %s", (playlist_id,),
+            "DELETE FROM playlists WHERE id = %s", (playlist_id,), # for some reason this does not work for the global songs playlist
             )
     else:
         cursor.execute(
             "DELETE FROM playlists WHERE id = %s AND user_id = %s", (playlist_id, user['id'],),
         )
+
+    rows_deleted = cursor.rowcount
+    if rows_deleted == 0:
+        return "Such playlist does not exist"
 
     cnx.commit()
     cursor.close()
