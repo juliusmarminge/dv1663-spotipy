@@ -78,6 +78,38 @@ procedures["CreateUser"] = ( # You can apperantly simply use the three quotes in
     END"""
 )
 
+functions = {}
+
+functions['VerifyUser'] = (# Verifies password with user id or username. Returns 1 if pwd is correct
+    """CREATE FUNCTION VerifyUser(
+        id INT,
+        name VARCHAR(255),
+        password VARCHAR(255)
+    ) 
+    RETURNS int
+    BEGIN
+        DECLARE to_return INT;
+        DECLARE table_password VARCHAR(255);
+
+        SET to_return = 0;
+
+        IF id IS NULL THEN
+            SELECT users.password INTO table_password FROM users WHERE users.username = name;
+        ELSEIF name IS NULL THEN
+            SELECT users.password INTO table_password FROM users WHERE users.id = id;
+        END IF;
+
+        IF password = table_password THEN
+            SET to_return = 1;
+        ELSE
+            SET to_return = 0;
+        END IF;
+
+        RETURN to_return;
+
+    END"""
+)
+
 def create_database(cursor):
     try:
         cursor.execute(f"CREATE DATABASE {DB_NAME} DEFAULT CHARACTER SET 'utf8'")
@@ -100,6 +132,17 @@ def create_table(cursor, name, query):
 def create_procedure(cursor, name, query):
     try:
         print(f"Creating procedure {name}: ", end="")
+        cursor.execute(query)
+        print("OK")
+    except MySQLError as err:
+        if err.errno == errorcode.ER_SP_ALREADY_EXISTS:
+            print("already exists.")
+        else:
+            print(err.msg)
+
+def create_function(cursor, name, query):
+    try:
+        print(f"Creating function {name}: ", end="")
         cursor.execute(query)
         print("OK")
     except MySQLError as err:
@@ -131,6 +174,10 @@ if __name__ == "__main__":
     for proc_name in procedures:
         query = procedures[proc_name]
         create_procedure(cursor, proc_name, query)
+
+    for func_name in functions:
+        query = functions[func_name]
+        create_function(cursor, func_name, query)
 
     cnx.commit()
     cursor.close()
