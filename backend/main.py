@@ -54,7 +54,7 @@ class CreatePlaylistPayload(BaseModel):
 
 @app.post("/playlists")
 async def create_playlist(
-    body: CreatePlaylistPayload, # why is this needed?
+    body: CreatePlaylistPayload,  # why is this needed?
     response: Response,
     authorization: Annotated[Union[str, None], Header()] = None,
 ):
@@ -69,6 +69,7 @@ async def create_playlist(
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
+
     cursor.execute(
         "INSERT INTO playlists (name, user_id) VALUES (%s, %s)",
         (body.name, user["id"]),
@@ -76,7 +77,7 @@ async def create_playlist(
     cnx.commit()
     cursor.close()
     cnx.close()
-    return "Ok"
+    return {"message": "Ok"}
 
 
 @app.get("/playlists/{playlist_id}")
@@ -118,7 +119,7 @@ async def get_playlist(playlist_id: int, response: Response):
 async def delete_playlist(
     playlist_id: int,
     response: Response,
-    authorization: Annotated[Union[str, None], Header()] = None, # auth is a must.
+    authorization: Annotated[Union[str, None], Header()] = None,  # auth is a must.
 ):
     """Delete a playlist for an authenticated user"""
 
@@ -128,49 +129,88 @@ async def delete_playlist(
 
     try:
         user = JSONDecoder().decode(authorization)
-        cursor.execute("SELECT VerifyUser(%s, NULL, %s)", (user['id'], user['password'],),)
-        dict = cursor.fetchone()
-        bool = list(dict.values())[0] # gets the element in the dict, which is 1 if user is verified
-        if not bool:
+        cursor.execute(
+            "SELECT VerifyUser(%s, NULL, %s) as verified",
+            (user["id"], user["password"]),
+        )
+        # gets the element in the dict, which is 1 if user is verified, 0 if not
+        verified = cursor.fetchone()["verified"]
+        print(verified)
+        if not verified:
             raise Exception
     except:
         response.status_code = 401
         return {"message": "Not authorized"}
-    
-    if(user['id'] == 1): # if admin, he can delete any.
+
+    if user["id"] == 1:  # if admin, he can delete any.
+        # for some reason this does not work for the global songs playlist
         cursor.execute(
-            "DELETE FROM playlists WHERE id = %s", (playlist_id,), # for some reason this does not work for the global songs playlist
-            )
+            "DELETE FROM playlists WHERE id = %s",
+            (playlist_id,),
+        )
     else:
         cursor.execute(
-            "DELETE FROM playlists WHERE id = %s AND user_id = %s", (playlist_id, user['id'],),
+            "DELETE FROM playlists WHERE id = %s AND user_id = %s",
+            (playlist_id, user["id"]),
         )
 
     rows_deleted = cursor.rowcount
     if rows_deleted == 0:
-        return "Such playlist does not exist"
+        response.status_code = 400
+        return {"message": "Such playlist does not exist, or you are not the owner."}
 
     cnx.commit()
     cursor.close()
     cnx.close()
-    return "Ok"
+    return {"message": "Ok"}
 
 
-@app.put("/playlists/{playlist_id}/{song_id}")
-async def add_song_to_playlist(playlist_id: int, song_id: int):
+class UpdatePlaylistPayload(BaseModel):
+    sond_id: int
+
+
+@app.put("/playlists/{playlist_id}")
+async def add_song_to_playlist(
+    playlist_id: int,
+    body: UpdatePlaylistPayload,
+    response: Response,
+    authorization: Annotated[Union[str, None], Header()] = None,
+):
     """Put a song with song_id into a playlist with playlist_id"""
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
+
+    try:
+        user = JSONDecoder().decode(authorization)
+        cursor.execute(
+            "SELECT VerifyUser(%s, NULL, %s) as verified",
+            (user["id"], user["password"]),
+        )
+
+        if not cursor.fetchone()["verified"]:
+            raise Exception
+
+        # check if the user owns the playlist
+        cursor.execute(
+            "SELECT * FROM playlists WHERE id = %s AND user_id = %s",
+            (playlist_id, user["id"]),
+        )
+        if cursor.fetchone() is None:
+            raise Exception
+    except:
+        response.status_code = 401
+        return {"message": "Not authorized"}
+
     cursor.execute(
         "INSERT INTO playlist_songs (playlist_id, song_id) VALUES (%s, %s)",
-        (playlist_id, song_id),
+        (playlist_id, body.song_id),
     )
     cnx.commit()
     cursor.close()
     cnx.close()
 
-    return "Ok"
+    return {"message": "Ok"}
 
 
 class UserPayload(BaseModel):
@@ -185,6 +225,7 @@ async def create_user(body: UserPayload, response: Response):
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
+
     try:
         cursor.execute(
             "CALL CreateUser(%s, %s)",
@@ -212,6 +253,7 @@ async def login_user(body: UserPayload, response: Response):
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
     cursor.execute("USE {}".format(DB_NAME))
+
     cursor.execute(
         "SELECT * FROM users WHERE username = %s AND password = %s",
         (body.username, body.password),

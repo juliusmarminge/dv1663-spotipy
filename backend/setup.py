@@ -56,15 +56,16 @@ TABLES["playlist_songs"] = (
     "  `playlist_id` int NOT NULL,"
     "  `song_id` int NOT NULL,"
     "  PRIMARY KEY (`playlist_id`, `song_id`),"  # don't allow duplicate songs in the same playlist
-    "  FOREIGN KEY (`playlist_id`) REFERENCES `playlists` (`id`),"
+    "  FOREIGN KEY (`playlist_id`) REFERENCES `playlists` (`id`) ON DELETE CASCADE,"
     "  FOREIGN KEY (`song_id`) REFERENCES `songs` (`id`)"
     ")"
 )
 
 procedures = {}
 
-procedures["CreateUser"] = ( # You can apperantly simply use the three quotes instead btw
-    """CREATE PROCEDURE CreateUser(
+procedures[
+    "CreateUser"
+] = """CREATE PROCEDURE CreateUser(
 	    IN inUsername VARCHAR(255),
         IN inPassword VARCHAR(255)
     )
@@ -75,23 +76,21 @@ procedures["CreateUser"] = ( # You can apperantly simply use the three quotes in
         SELECT LAST_INSERT_ID() INTO userID;
         INSERT INTO playlists (name, user_id) VALUES ('Liked Songs', userID);
     
-    END"""
-)
+    END"""  # You can apperantly simply use the three quotes instead btw
 
 functions = {}
 
-functions['VerifyUser'] = (# Verifies password with user id or username. Returns 1 if pwd is correct
-    """CREATE FUNCTION VerifyUser(
+functions[
+    "VerifyUser"
+] = """CREATE FUNCTION VerifyUser(
         id INT,
         name VARCHAR(255),
         password VARCHAR(255)
     ) 
     RETURNS int
+    READS SQL DATA
     BEGIN
-        DECLARE to_return INT;
         DECLARE table_password VARCHAR(255);
-
-        SET to_return = 0;
 
         IF id IS NULL THEN
             SELECT users.password INTO table_password FROM users WHERE users.username = name;
@@ -100,24 +99,14 @@ functions['VerifyUser'] = (# Verifies password with user id or username. Returns
         END IF;
 
         IF password = table_password THEN
-            SET to_return = 1;
-        ELSE
-            SET to_return = 0;
+            RETURN 1;
         END IF;
+        RETURN 0;
 
-        RETURN to_return;
-
-    END"""
-)
+    END"""  # Verifies password with user id or username. Returns 1 if pwd is correct
 
 triggers = {}
 
-triggers['before_playlist_delete'] = (
-    """CREATE TRIGGER before_playlist_delete
-	BEFORE DELETE ON playlists
-    FOR EACH ROW
-    DELETE FROM playlist_songs WHERE playlist_id = OLD.id;"""
-)
 
 def create_database(cursor):
     try:
@@ -138,6 +127,7 @@ def create_table(cursor, name, query):
         else:
             print(err.msg)
 
+
 def create_procedure(cursor, name, query):
     try:
         print(f"Creating procedure {name}: ", end="")
@@ -148,6 +138,7 @@ def create_procedure(cursor, name, query):
             print("already exists.")
         else:
             print(err.msg)
+
 
 def create_function(cursor, name, query):
     try:
@@ -160,6 +151,7 @@ def create_function(cursor, name, query):
         else:
             print(err.msg)
 
+
 def create_trigger(cursor, name, query):
     try:
         print(f"Creating trigger {name}: ", end="")
@@ -170,6 +162,7 @@ def create_trigger(cursor, name, query):
             print("already exists.")
         else:
             print(err.msg)
+
 
 if __name__ == "__main__":
     cnx = MySQLConnection(**config)
@@ -198,7 +191,7 @@ if __name__ == "__main__":
     for func_name in functions:
         query = functions[func_name]
         create_function(cursor, func_name, query)
-    
+
     for trig_name in triggers:
         query = triggers[trig_name]
         create_trigger(cursor, trig_name, query)

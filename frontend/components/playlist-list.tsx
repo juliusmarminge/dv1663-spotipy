@@ -2,7 +2,7 @@ import { Playlist } from "~/types/models";
 import { CreatePlaylistForm } from "~/components/playlist-form";
 import { API_URL, LS_COOKIE_NAME } from "~/app/contants";
 import { cookies } from "next/headers";
-import Link from "next/link";
+import { PlaylistListItem } from "~/components/playlist-list-item";
 
 export async function Playlists() {
   const user = cookies().get(LS_COOKIE_NAME)?.value;
@@ -26,16 +26,5 @@ export async function Playlists() {
         ))}
       </div>
     </div>
-  );
-}
-
-function PlaylistListItem(props: { playlist: Playlist }) {
-  return (
-    <Link
-      href={`/playlist/${props.playlist.id}`}
-      className="hover:bg-background p-2 rounded"
-    >
-      <span>{props.playlist.name}</span>
-    </Link>
   );
 }
