@@ -106,12 +106,10 @@ function SongActions(props: {
       }
     );
 
-    const json = await res.json();
-    console.log(json);
     if (!res.ok) {
+      const json = await res.json();
       alert(json.message);
     }
-
     router.refresh();
   }
 
@@ -141,6 +139,11 @@ function SongActions(props: {
             ))}
           </DropdownMenuSubContent>
         </DropdownMenuSub>
+
+        <DropdownMenuItem>
+          Remove from playlist
+          <Icons.Trash className="ml-auto h-4 w-4" />
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

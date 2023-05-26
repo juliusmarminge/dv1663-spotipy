@@ -134,9 +134,7 @@ async def delete_playlist(
             (user["id"], user["password"]),
         )
         # gets the element in the dict, which is 1 if user is verified, 0 if not
-        verified = cursor.fetchone()["verified"]
-        print(verified)
-        if not verified:
+        if not cursor.fetchone()["verified"]:
             raise Exception
     except:
         response.status_code = 401
@@ -198,10 +196,19 @@ async def add_song_to_playlist(
         response.status_code = 401
         return {"message": "Not authorized"}
 
-    cursor.execute(
-        "INSERT INTO playlist_songs (playlist_id, song_id) VALUES (%s, %s)",
-        (playlist_id, song_id),
-    )
+    try:
+        cursor.execute(
+            "INSERT INTO playlist_songs (playlist_id, song_id) VALUES (%s, %s)",
+            (playlist_id, song_id),
+        )
+    except MySqlError as err:
+        if err.errno == errorcode.ER_DUP_ENTRY:
+            response.status_code = 400
+            return {"message": "Song already in playlist"}
+
+        response.status_code = 500
+        return {"message": "Something went wrong..."}
+
     cnx.commit()
     cursor.close()
     cnx.close()
