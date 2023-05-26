@@ -190,7 +190,7 @@ async def add_song_to_playlist(
             "SELECT * FROM playlists WHERE id = %s AND user_id = %s",
             (playlist_id, user["id"]),
         )
-        if cursor.fetchone() is None:
+        if cursor.fetchone() is None and user['id'] != 1:
             raise Exception
     except:
         response.status_code = 401
@@ -215,6 +215,54 @@ async def add_song_to_playlist(
 
     return {"message": "Ok"}
 
+@app.delete("/playlists/{playlist_id}/{song_id}")
+async def del_song_from_playlist(
+    playlist_id: int,
+    song_id: int,
+    response: Response,
+    authorization: Annotated[Union[str, None], Header()] = None,
+):
+    """Delete a song with song_id from a playlist with playlist_id"""
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor(dictionary=True)
+    cursor.execute("USE {}".format(DB_NAME))
+
+    try:
+        user = JSONDecoder().decode(authorization)
+        cursor.execute(
+            "SELECT VerifyUser(%s, NULL, %s) as verified",
+            (user["id"], user["password"]),
+        )
+
+        if not cursor.fetchone()["verified"]:
+            raise Exception
+
+        # check if the user owns the playlist
+        cursor.execute(
+            "SELECT * FROM playlists WHERE id = %s AND user_id = %s",
+            (playlist_id, user["id"]),
+        )
+        if cursor.fetchone() is None and user['id'] != 1:
+            raise Exception
+    except:
+        response.status_code = 401
+        return {"message": "Not authorized"}
+    
+    cursor.execute(
+        "DELETE FROM playlist_songs WHERE playlist_id = %s AND song_id = %s",
+        (playlist_id, song_id),
+    )
+
+    rows_deleted = cursor.rowcount
+    if rows_deleted == 0:
+        response.status_code = 400
+        return {"message": "Such song does not exist in this playlist"}
+
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+    return {"message": "Ok"}
 
 class UserPayload(BaseModel):
     id: int = None
