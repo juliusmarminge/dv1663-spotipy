@@ -140,7 +140,7 @@ function SongActions(props: {
           </DropdownMenuSubContent>
         </DropdownMenuSub>
 
-        <DropdownMenuItem>
+        <DropdownMenuItem disabled>
           Remove from playlist
           <Icons.Trash className="ml-auto h-4 w-4" />
         </DropdownMenuItem>
