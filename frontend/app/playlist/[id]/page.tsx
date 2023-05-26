@@ -8,7 +8,7 @@ import { cookies } from "next/headers";
 export const dynamic = "force-dynamic";
 
 type PlaylistResponse = {
-  id: string;
+  id: number;
   name: string;
   owner: string;
   songs: (Song & { artist_name: string })[];
@@ -66,6 +66,7 @@ export default async function Home(props: { params: { id: string } }) {
             key={song.id}
             {...song}
             idx={idx + 1}
+            currentPlaylistId={playlist.id}
             userPlaylists={userPlaylists}
           />
         ))}

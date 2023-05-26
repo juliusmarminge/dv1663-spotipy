@@ -20,7 +20,12 @@ import { API_URL, LS_COOKIE_NAME } from "~/app/contants";
 import { useRouter } from "next/navigation";
 
 export function SongCard(
-  props: Song & { idx: number; artist_name: string; userPlaylists: Playlist[] }
+  props: Song & {
+    idx: number;
+    artist_name: string;
+    userPlaylists: Playlist[];
+    currentPlaylistId: number;
+  }
 ) {
   const { song, setSong } = useCurrentSong();
   const { isPlaying, setIsPlaying } = useIsPlaying();
@@ -80,6 +85,7 @@ export function SongCard(
       <SongActions
         songId={props.id}
         artistId={props.artist_id}
+        currentPlaylistId={props.currentPlaylistId}
         userPlaylists={props.userPlaylists}
       />
     </div>
@@ -89,16 +95,17 @@ export function SongCard(
 function SongActions(props: {
   songId: Song["id"];
   artistId: Artist["id"];
+  currentPlaylistId: number;
   userPlaylists: Playlist[];
 }) {
   const router = useRouter();
 
-  async function addToPlaylist(playlistId: number) {
+  async function handleClick(playlistId: number, action: "DELETE" | "PUT") {
     const user = localStorage.getItem(LS_COOKIE_NAME);
     const res = await fetch(
       `${API_URL}/playlists/${playlistId}/${props.songId}`,
       {
-        method: "PUT",
+        method: action,
         headers: {
           "Content-Type": "application/json",
           ...(user ? { Authorization: user } : {}),
@@ -132,7 +139,7 @@ function SongActions(props: {
             {props.userPlaylists.map((playlist) => (
               <DropdownMenuItem
                 key={playlist.id}
-                onClick={() => addToPlaylist(playlist.id)}
+                onClick={() => handleClick(playlist.id, "PUT")}
               >
                 {playlist.name}
               </DropdownMenuItem>
@@ -140,7 +147,9 @@ function SongActions(props: {
           </DropdownMenuSubContent>
         </DropdownMenuSub>
 
-        <DropdownMenuItem disabled>
+        <DropdownMenuItem
+          onClick={() => handleClick(props.currentPlaylistId, "DELETE")}
+        >
           Remove from playlist
           <Icons.Trash className="ml-auto h-4 w-4" />
         </DropdownMenuItem>
