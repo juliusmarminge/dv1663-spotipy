@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import * as Icons from "./icons";
-import type { Artist, Song } from "~/types/models";
+import * as Icons from "~/components/icons";
+import type { Artist, Playlist, Song } from "~/types/models";
 import { useCurrentSong, useIsPlaying } from "~/app/atoms";
 import { twMerge } from "tailwind-merge";
 import {
@@ -16,8 +16,12 @@ import {
   DropdownMenuSeparator,
 } from "~/components/dropdown-menu";
 import Link from "next/link";
+import { API_URL, LS_COOKIE_NAME } from "~/app/contants";
+import { useRouter } from "next/navigation";
 
-export function SongCard(props: Song & { idx: number; artist_name: string }) {
+export function SongCard(
+  props: Song & { idx: number; artist_name: string; userPlaylists: Playlist[] }
+) {
   const { song, setSong } = useCurrentSong();
   const { isPlaying, setIsPlaying } = useIsPlaying();
 
@@ -73,15 +77,43 @@ export function SongCard(props: Song & { idx: number; artist_name: string }) {
         </Link>
       </div>
 
-      <SongActions songId={props.id} artistId={props.artist_id} />
+      <SongActions
+        songId={props.id}
+        artistId={props.artist_id}
+        userPlaylists={props.userPlaylists}
+      />
     </div>
   );
 }
 
-function SongActions(props: { songId: Song["id"]; artistId: Artist["id"] }) {
-  const addToPlaylist = (playlistName: string) => {
-    console.log(`${props.songId} added to ${playlistName}`);
-  };
+function SongActions(props: {
+  songId: Song["id"];
+  artistId: Artist["id"];
+  userPlaylists: Playlist[];
+}) {
+  const router = useRouter();
+
+  async function addToPlaylist(playlistId: number) {
+    const user = localStorage.getItem(LS_COOKIE_NAME);
+    const res = await fetch(
+      `${API_URL}/playlists/${playlistId}/${props.songId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...(user ? { Authorization: user } : {}),
+        },
+      }
+    );
+
+    const json = await res.json();
+    console.log(json);
+    if (!res.ok) {
+      alert(json.message);
+    }
+
+    router.refresh();
+  }
 
   return (
     <DropdownMenu>
@@ -96,21 +128,17 @@ function SongActions(props: { songId: Song["id"]; artistId: Artist["id"] }) {
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem onClick={() => addToPlaylist("user_liked")}>
-          Save to your Liked Songs
-        </DropdownMenuItem>
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>Add to Playlist</DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
-            <DropdownMenuItem onClick={() => addToPlaylist("Foobar")}>
-              Foobar
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => addToPlaylist("Foobaz")}>
-              Foobaz
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => addToPlaylist("Barbaz")}>
-              Barbaz
-            </DropdownMenuItem>
+            {props.userPlaylists.map((playlist) => (
+              <DropdownMenuItem
+                key={playlist.id}
+                onClick={() => addToPlaylist(playlist.id)}
+              >
+                {playlist.name}
+              </DropdownMenuItem>
+            ))}
           </DropdownMenuSubContent>
         </DropdownMenuSub>
       </DropdownMenuContent>

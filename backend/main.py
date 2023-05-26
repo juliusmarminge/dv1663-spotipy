@@ -165,14 +165,10 @@ async def delete_playlist(
     return {"message": "Ok"}
 
 
-class UpdatePlaylistPayload(BaseModel):
-    sond_id: int
-
-
-@app.put("/playlists/{playlist_id}")
+@app.put("/playlists/{playlist_id}/{song_id}")
 async def add_song_to_playlist(
     playlist_id: int,
-    body: UpdatePlaylistPayload,
+    song_id: int,
     response: Response,
     authorization: Annotated[Union[str, None], Header()] = None,
 ):
@@ -204,7 +200,7 @@ async def add_song_to_playlist(
 
     cursor.execute(
         "INSERT INTO playlist_songs (playlist_id, song_id) VALUES (%s, %s)",
-        (playlist_id, body.song_id),
+        (playlist_id, song_id),
     )
     cnx.commit()
     cursor.close()
