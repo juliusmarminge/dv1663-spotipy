@@ -216,7 +216,7 @@ async def add_song_to_playlist(
     return {"message": "Ok"}
 
 @app.delete("/playlists/{playlist_id}/{song_id}")
-async def del_song_from_playlist(
+async def delete_song_from_playlist(
     playlist_id: int,
     song_id: int,
     response: Response,
