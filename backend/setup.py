@@ -110,6 +110,15 @@ functions['VerifyUser'] = (# Verifies password with user id or username. Returns
     END"""
 )
 
+triggers = {}
+
+triggers['before_playlist_delete'] = (
+    """CREATE TRIGGER before_playlist_delete
+	BEFORE DELETE ON playlists
+    FOR EACH ROW
+    DELETE FROM playlist_songs WHERE playlist_id = OLD.id;"""
+)
+
 def create_database(cursor):
     try:
         cursor.execute(f"CREATE DATABASE {DB_NAME} DEFAULT CHARACTER SET 'utf8'")
@@ -151,6 +160,17 @@ def create_function(cursor, name, query):
         else:
             print(err.msg)
 
+def create_trigger(cursor, name, query):
+    try:
+        print(f"Creating trigger {name}: ", end="")
+        cursor.execute(query)
+        print("OK")
+    except MySQLError as err:
+        if err.errno == errorcode.ER_TRG_ALREADY_EXISTS:
+            print("already exists.")
+        else:
+            print(err.msg)
+
 if __name__ == "__main__":
     cnx = MySQLConnection(**config)
     cursor = cnx.cursor()
@@ -178,6 +198,10 @@ if __name__ == "__main__":
     for func_name in functions:
         query = functions[func_name]
         create_function(cursor, func_name, query)
+    
+    for trig_name in triggers:
+        query = triggers[trig_name]
+        create_trigger(cursor, trig_name, query)
 
     cnx.commit()
     cursor.close()
