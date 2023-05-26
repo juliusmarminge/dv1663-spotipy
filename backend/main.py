@@ -115,7 +115,7 @@ async def get_playlist(playlist_id: int, response: Response):
 
 
 @app.delete("/playlists/{playlist_id}")
-async def delete_playlist( #TODO: and a trigger that removes playlist songs.
+async def delete_playlist(
     playlist_id: int,
     response: Response,
     authorization: Annotated[Union[str, None], Header()] = None, # auth is a must.
