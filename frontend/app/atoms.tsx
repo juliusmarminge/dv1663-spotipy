@@ -1,4 +1,5 @@
 import { atom, useAtom } from "jotai";
+import { API_URL } from "./contants";
 
 type PlayingSong = {
   id: number;
@@ -17,8 +18,8 @@ export const useIsPlaying = () => {
 };
 
 export const useCurrentSong = () => {
-  const [song, _setSong] = useAtom(currentSongAtom);
-  const [_1, setIsPlaying] = useAtom(isPlayingAtom);
+  const [currentSong, _setSong] = useAtom(currentSongAtom);
+  const [_, setIsPlaying] = useAtom(isPlayingAtom);
 
   const setSong = (song: PlayingSong | null) => {
     if (!song) {
@@ -26,9 +27,19 @@ export const useCurrentSong = () => {
       _setSong(null);
       return;
     }
+
     setIsPlaying(true);
     _setSong(song);
+
+    if (song.id !== currentSong?.id) {
+      // register song played to backend - we're not doing some sophisticated
+      // algorithm to determine how much of the song was played, we're just
+      // registering that the song was played at all. this could use some improvement.
+      fetch(`${API_URL}/song/${song.id}`, {
+        method: "PUT",
+      });
+    }
   };
 
-  return { song, setSong };
+  return { song: currentSong, setSong };
 };
