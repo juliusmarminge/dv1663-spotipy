@@ -1,5 +1,5 @@
 import { Playlist, Song } from "~/types/models";
-import { SongCard } from "~/components/song-card";
+import { SongCard } from "~/app/songs/song-card";
 import { API_URL, LS_COOKIE_NAME } from "~/lib/contants";
 import Link from "next/link";
 import { cookies } from "next/headers";

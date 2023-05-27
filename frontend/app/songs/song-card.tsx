@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import * as Icons from "~/components/icons";
+import * as Icons from "~/ui/icons";
 import type { Artist, Playlist, Song } from "~/types/models";
 import { useCurrentSong, useIsPlaying } from "~/lib/atoms";
 import { twMerge } from "tailwind-merge";
@@ -14,7 +14,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
   DropdownMenuSeparator,
-} from "~/components/dropdown-menu";
+} from "~/ui/dropdown-menu";
 import Link from "next/link";
 import { API_URL, LS_COOKIE_NAME } from "~/lib/contants";
 import { useRouter } from "next/navigation";

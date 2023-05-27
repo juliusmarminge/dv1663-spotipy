@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Input } from "./input";
-import * as Icons from "./icons";
+import { Input } from "~/ui/input";
+import * as Icons from "~/ui/icons";
 import { useRouter } from "next/navigation";
 
 export function SearchBox() {

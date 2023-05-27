@@ -1,8 +1,8 @@
 import { Playlist } from "~/types/models";
-import { CreatePlaylistForm } from "~/components/playlist-form";
+import { CreatePlaylistForm } from "~/app/playlist/playlist-form";
 import { API_URL, LS_COOKIE_NAME } from "~/lib/contants";
 import { cookies } from "next/headers";
-import { PlaylistListItem } from "~/components/playlist-list-item";
+import { PlaylistListItem } from "~/app/playlist/playlist-list-item";
 
 export async function Playlists() {
   const user = cookies().get(LS_COOKIE_NAME)?.value;

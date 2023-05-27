@@ -1,8 +1,8 @@
 "use client";
 import * as React from "react";
 import { useCurrentSong, useIsPlaying } from "~/lib/atoms";
-import * as Icons from "~/components//icons";
-import { Slider } from "~/components/slider";
+import * as Icons from "~/ui/icons";
+import { Slider } from "~/ui/slider";
 import { API_URL } from "~/lib/contants";
 import { twMerge } from "tailwind-merge";
 

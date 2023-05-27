@@ -1,10 +1,9 @@
 import { Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
-import tailwindAnimate from "tailwindcss-animate";
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./components/**/*.tsx", "./app/**/*.tsx"],
+  content: ["./ui/**/*.tsx", "./app/**/*.tsx"],
   theme: {
     extend: {
       fontFamily: {
@@ -39,5 +38,5 @@ export default {
       },
     },
   },
-  plugins: [tailwindAnimate],
+  plugins: [require("tailwindcss-animate")],
 } satisfies Config;

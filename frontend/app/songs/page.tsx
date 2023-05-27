@@ -1,8 +1,8 @@
 import { Song } from "~/types/models";
-import { SongCard } from "~/components/song-card";
+import { SongCard } from "~/app/songs/song-card";
 import { API_URL } from "~/lib/contants";
 import Link from "next/link";
-import { getUserPlaylists } from "../../lib/fetch-helpers";
+import { getUserPlaylists } from "~/lib/fetch-helpers";
 
 // Don't cache this page
 export const dynamic = "force-dynamic";

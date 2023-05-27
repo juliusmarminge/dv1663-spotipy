@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import * as Icons from "./icons";
-import { Button } from "./button";
+import * as Icons from "~/ui/icons";
+import { Button } from "~/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./dropdown-menu";
+} from "~/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -18,8 +18,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "./dialog";
-import { Input } from "./input";
+} from "~/ui/dialog";
+import { Input } from "~/ui/input";
 import { API_URL, LS_COOKIE_NAME } from "~/lib/contants";
 import { User } from "~/types/models";
 import Image from "next/image";

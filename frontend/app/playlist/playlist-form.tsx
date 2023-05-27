@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { API_URL } from "~/lib/contants";
-import { Button } from "~/components/button";
-import { Input } from "~/components/input";
+import { Button } from "~/ui/button";
+import { Input } from "~/ui/input";
 
 export function CreatePlaylistForm(props: { user?: string }) {
   const ref = React.useRef<HTMLFormElement>(null);

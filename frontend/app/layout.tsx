@@ -1,11 +1,11 @@
-import "./globals.css";
+import "~/app/globals.css";
 import { Inter } from "next/font/google";
-import { Playlists } from "~/components/playlist-list";
-import * as Icons from "~/components/icons";
-import { UserSwitcher } from "~/components/user-switcher";
-import { Playbar } from "~/components/playbar";
+import { Playlists } from "~/app/playlist/playlist-list";
+import * as Icons from "~/ui/icons";
+import { UserSwitcher } from "~/app/user-switcher";
+import { Playbar } from "~/app/playbar";
 import { twMerge } from "tailwind-merge";
-import { SearchBox } from "~/components/search-box";
+import { SearchBox } from "~/app/search-box";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 

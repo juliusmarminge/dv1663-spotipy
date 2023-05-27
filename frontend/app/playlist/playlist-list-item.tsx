@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import * as Icons from "~/components/icons";
-import { Button } from "~/components/button";
+import * as Icons from "~/ui/icons";
+import { Button } from "~/ui/button";
 import { Playlist } from "~/types/models";
 import { API_URL, LS_COOKIE_NAME } from "~/lib/contants";
 import Link from "next/link";
