@@ -23,6 +23,7 @@ export function SearchBox() {
 
   return (
     <form
+      className="h-7"
       onSubmit={() => {
         setOpen(false);
         setSearch("");
@@ -36,7 +37,7 @@ export function SearchBox() {
         onChange={(e) => setSearch(e.target.value)}
         onFocus={() => setOpen(true)}
         onBlur={() => setOpen(false)}
-        className="w-full"
+        className="w-full h-7"
       />
     </form>
   );
