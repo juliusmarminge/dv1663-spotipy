@@ -5,6 +5,14 @@ ARTISTS = [
     {"name": "Coldplay", "biography": "blah blah blah"},
     {"name": "Miles Teller", "biography": "blah blah blah2"},
     {"name": "One Republic", "biography": "blah blah blah3"},
+    {"name": "ADAAM", "biography": "blah blah blah4"},
+    {"name": "Post Malone", "biography": "blah blah blah5"},
+    {"name": "Käärijä", "biography": "blah blah blah6"},
+    {"name": "Jonas Blue", "biography": "blah blah blah7"},
+    {"name": "Bolaget", "biography": "blah blah blah8"},
+    {"name": "Jonas Brothers", "biography": "blah blah blah9"},
+    {"name": "Loreen", "biography": "blah blah blah10"},
+    {"name": "Charlie Puth", "biography": "blah blah blah11"},
 ]
 
 SONGS = [
@@ -25,6 +33,66 @@ SONGS = [
         "artist_id": 3,
         "mp3_path": "/static/i-aint-worried.mp3",
         "cover_path": "https://images.unsplash.com/photo-1563089145-599997674d42?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2370&q=80",
+    },
+    {
+        "title": "17",
+        "artist_id": 4,
+        "mp3_path": "/static/17.mp3",
+        "cover_path": "https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=987&q=80",
+    },
+    {
+        "title": "Candy Paint",
+        "artist_id": 5,
+        "mp3_path": "/static/candy-paint.mp3",
+        "cover_path": "https://images.unsplash.com/photo-1604079628040-94301bb21b91?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+    },
+    {
+        "title": "Cha Cha Cha",
+        "artist_id": 6,
+        "mp3_path": "/static/cha-cha-cha.mp3",
+        "cover_path": "https://images.unsplash.com/photo-1604076913837-52ab5629fba9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+    },
+    {
+        "title": "Fast Car",
+        "artist_id": 7,
+        "mp3_path": "/static/fast-car.mp3",
+        "cover_path": "https://images.unsplash.com/photo-1557672172-298e090bd0f1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+    },
+    {
+        "title": "Ikväll igen",
+        "artist_id": 8,
+        "mp3_path": "/static/ikvall-igen.mp3",
+        "cover_path": "https://images.unsplash.com/photo-1506259091721-347e791bab0f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+    },
+    {
+        "title": "Mourning",
+        "artist_id": 5,
+        "mp3_path": "/static/mourning.mp3",
+        "cover_path": "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80",
+    },
+    {
+        "title": "Waffle House",
+        "artist_id": 9,
+        "mp3_path": "/static/waffle-house.mp3",
+        "cover_path": "https://images.unsplash.com/photo-1552083974-186346191183?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+    },
+    {
+        "title": "Summer Baby",
+        "artist_id": 9,
+        "mp3_path": "/static/summer-baby.mp3",
+        "cover_path": "https://images.unsplash.com/photo-1561212044-bac5ef688a07?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+    },
+    {
+        "title": "Tattoo",
+        "artist_id": 10,
+        "mp3_path": "/static/tattoo.mp3",
+        "cover_path": "https://images.unsplash.com/photo-1513346940221-6f673d962e97?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
+    },
+    {
+        "title": "That's not how this works",
+        "artist_id": 11,
+        "mp3_path": "/static/thats-not-how-this-works.mp3",
+        "cover_path": "https://images.unsplash.com/photo-1515405295579-ba7b45403062?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1160&q=80",
     },
 ]
 
