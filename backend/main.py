@@ -264,6 +264,36 @@ async def delete_song_from_playlist(
 
     return {"message": "Ok"}
 
+@app.put("/song/{song_id}")
+async def register_play(
+    song_id: int,
+    response: Response,
+    #authorization: Annotated[Union[str, None], Header()] = None, Maybe not needed?
+):
+    """Registers a play for a song with song_id"""
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor(dictionary=True)
+    cursor.execute("USE {}".format(DB_NAME))
+    try:
+        cursor.execute(
+            "UPDATE songs SET played_times = played_times + 1 WHERE id = %s",
+            (song_id,),
+        )
+    except MySqlError as err:
+        print(err.errno)
+
+    rows_updated = cursor.rowcount
+    if rows_updated == 0:
+        response.status_code = 400
+        return {"message": "Such song does not exist"}
+
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+    response.status_code = 201
+    return {"message": 'Ok'}
+
 class UserPayload(BaseModel):
     id: int = None
     username: str
