@@ -62,6 +62,16 @@ TABLES["playlist_songs"] = (
     ")"
 )
 
+views = {}
+
+views['global_with_played'] = ( # shows the global playlist songs along with the their played_times
+    """CREATE OR REPLACE VIEW global_with_played AS
+	    SELECT playlist_songs.playlist_id, playlist_songs.song_id, songs.played_times
+		    FROM playlist_songs
+		    INNER JOIN songs ON playlist_songs.song_id = songs.id
+		    WHERE playlist_songs.playlist_id = 1;"""
+)
+
 procedures = {}
 
 procedures[
@@ -145,6 +155,13 @@ def create_table(cursor, name, query):
         else:
             print(err.msg)
 
+def create_view(cursor, name, query):
+    try:
+        print(f"Creating view {name}: ", end="")
+        cursor.execute(query)
+        print("OK")
+    except MySQLError as err:
+        print(err.msg)
 
 def create_procedure(cursor, name, query):
     try:
@@ -201,6 +218,10 @@ if __name__ == "__main__":
     for table_name in TABLES:
         query = TABLES[table_name]
         create_table(cursor, table_name, query)
+
+    for view_name in views:
+        query = views[view_name]
+        create_view(cursor, view_name, query)
 
     for proc_name in procedures:
         query = procedures[proc_name]
