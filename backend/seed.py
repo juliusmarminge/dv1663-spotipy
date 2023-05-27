@@ -79,15 +79,6 @@ def initialize_toplist(cursor):
     except MySQLError as err:
         print(err)
 
-    # playlist_id = cursor.lastrowid
-    # # Add songs to playlist
-    # for song_id in range(1, len(SONGS) + 1):
-    #     try:
-    #         query = f"INSERT INTO playlist_songs (playlist_id, song_id) VALUES ({playlist_id}, {song_id})"
-    #         cursor.execute(query)
-    #     except MySQLError as err:
-    #         print(err)
-
 
 if __name__ == "__main__":
     cnx = MySQLConnection(**config)
@@ -101,7 +92,7 @@ if __name__ == "__main__":
 
     print("Seeding complete!\n")
 
-    playlist_id = initialize_toplist(cursor)
+    initialize_toplist(cursor)
 
     for artist in ARTISTS:
         insert_artist(cursor, **artist)
