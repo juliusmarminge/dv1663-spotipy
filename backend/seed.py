@@ -31,11 +31,11 @@ SONGS = [
 
 def insert_song(cursor, title, artist_id, mp3_path, cover_path):
     query = (
-        "INSERT INTO songs (title, artist_id, mp3_path, cover_path, played_times) "
-        "VALUES (%s, %s, %s, %s, %s)"
+        "INSERT INTO songs (title, artist_id, mp3_path, cover_path) "
+        "VALUES (%s, %s, %s, %s)"
     )
 
-    values = (title, artist_id, mp3_path, cover_path, 0)
+    values = (title, artist_id, mp3_path, cover_path)
     try:
         print(f"Inserting song '{title}': ", end="")
         cursor.execute(query, values)
@@ -99,12 +99,14 @@ if __name__ == "__main__":
         print(f"Database {DB_NAME} does not exists. Did you forget to run `setup.py`?")
         exit(1)
 
+    print("Seeding complete!\n")
+
+    playlist_id = initialize_toplist(cursor)
+
     for artist in ARTISTS:
         insert_artist(cursor, **artist)
     for song in SONGS:
         insert_song(cursor, **song)
-
-    playlist_id = initialize_toplist(cursor)
 
     print("Seeding complete!\n")
 
