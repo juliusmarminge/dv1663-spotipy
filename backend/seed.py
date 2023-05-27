@@ -2,17 +2,29 @@ from mysql.connector import MySQLConnection, Error as MySQLError, errorcode
 from setup import config, DB_NAME
 
 ARTISTS = [
-    {"name": "Coldplay", "biography": "blah blah blah"},
-    {"name": "Miles Teller", "biography": "blah blah blah2"},
-    {"name": "One Republic", "biography": "blah blah blah3"},
-    {"name": "ADAAM", "biography": "blah blah blah4"},
-    {"name": "Post Malone", "biography": "blah blah blah5"},
+    {"name": "Coldplay", "biography": "British rock band formed in 1996"},
+    {
+        "name": "Miles Teller",
+        "biography": "American actor famous for his role in Top Gun Maverick.",
+    },
+    {"name": "One Republic", "biography": "American pop rock band formed in 2002"},
+    {"name": "ADAAM", "biography": "Swedish rapper"},
+    {
+        "name": "Post Malone",
+        "biography": "Post Malone is an American rapper, singer, and songwriter",
+    },
     {"name": "Käärijä", "biography": "blah blah blah6"},
-    {"name": "Jonas Blue", "biography": "blah blah blah7"},
-    {"name": "Bolaget", "biography": "blah blah blah8"},
-    {"name": "Jonas Brothers", "biography": "blah blah blah9"},
-    {"name": "Loreen", "biography": "blah blah blah10"},
-    {"name": "Charlie Puth", "biography": "blah blah blah11"},
+    {"name": "Jonas Blue", "biography": "English DJ, record producer and songwriter"},
+    {"name": "Bolaget", "biography": "Swedish pop group formed in 2015"},
+    {"name": "Jonas Brothers", "biography": "American pop rock band formed in 2005."},
+    {
+        "name": "Loreen",
+        "biography": "Swedish pop singer and songwriter known for winning the Eurovision Song Contest in 2012 with her song Euphoria.",
+    },
+    {
+        "name": "Charlie Puth",
+        "biography": "Charlie Puth is an American singer, songwriter, and record producer",
+    },
 ]
 
 SONGS = [

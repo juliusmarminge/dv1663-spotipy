@@ -25,6 +25,35 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
+@app.get("/artists/{artist_id}")
+async def get_artist(artist_id: int, response: Response):
+    """Get all songs from the playlist with the playlist_id."""
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor(dictionary=True)
+    cursor.execute("USE {}".format(DB_NAME))
+
+    cursor.execute(
+        "SELECT A.id, A.name, A.biography FROM artists A WHERE A.id = %s", (artist_id,)
+    )
+    artist = cursor.fetchone()
+
+    if artist is None:
+        response.status_code = 404
+        return {"message": "Playlist not found"}
+
+    cursor.execute(
+        "SELECT * FROM songs WHERE artist_id = %s ORDER BY played_times DESC",
+        (artist_id,),
+    )
+    songs = cursor.fetchall()
+    artist["songs"] = songs
+
+    cursor.close()
+    cnx.close()
+
+    return artist
+
+
 @app.get("/playlists")
 async def get_playlists(authorization: Annotated[Union[str, None], Header()] = None):
     """Get all public playlists. Include private playlists if authorization header is provided."""
@@ -190,7 +219,7 @@ async def add_song_to_playlist(
             "SELECT * FROM playlists WHERE id = %s AND user_id = %s",
             (playlist_id, user["id"]),
         )
-        if cursor.fetchone() is None and user['id'] != 1:
+        if cursor.fetchone() is None and user["id"] != 1:
             raise Exception
     except:
         response.status_code = 401
@@ -214,6 +243,7 @@ async def add_song_to_playlist(
     cnx.close()
 
     return {"message": "Ok"}
+
 
 @app.delete("/playlists/{playlist_id}/{song_id}")
 async def delete_song_from_playlist(
@@ -242,12 +272,12 @@ async def delete_song_from_playlist(
             "SELECT * FROM playlists WHERE id = %s AND user_id = %s",
             (playlist_id, user["id"]),
         )
-        if cursor.fetchone() is None and user['id'] != 1:
+        if cursor.fetchone() is None and user["id"] != 1:
             raise Exception
     except:
         response.status_code = 401
         return {"message": "Not authorized"}
-    
+
     cursor.execute(
         "DELETE FROM playlist_songs WHERE playlist_id = %s AND song_id = %s",
         (playlist_id, song_id),
@@ -264,11 +294,12 @@ async def delete_song_from_playlist(
 
     return {"message": "Ok"}
 
+
 @app.put("/song/{song_id}")
 async def register_play(
     song_id: int,
     response: Response,
-    #authorization: Annotated[Union[str, None], Header()] = None, Maybe not needed?
+    # authorization: Annotated[Union[str, None], Header()] = None, Maybe not needed?
 ):
     """Registers a play for a song with song_id"""
     cnx = mysql.connector.connect(**config)
@@ -292,7 +323,8 @@ async def register_play(
     cnx.close()
 
     response.status_code = 201
-    return {"message": 'Ok'}
+    return {"message": "Ok"}
+
 
 class UserPayload(BaseModel):
     id: int = None

@@ -24,7 +24,7 @@ export function SongCard(
     idx: number;
     artist_name: string;
     userPlaylists: Playlist[];
-    currentPlaylistId: number;
+    currentPlaylistId?: number;
   }
 ) {
   const { song, setSong } = useCurrentSong();
@@ -95,7 +95,7 @@ export function SongCard(
 function SongActions(props: {
   songId: Song["id"];
   artistId: Artist["id"];
-  currentPlaylistId: number;
+  currentPlaylistId?: number;
   userPlaylists: Playlist[];
 }) {
   const router = useRouter();
@@ -134,7 +134,9 @@ function SongActions(props: {
         <DropdownMenuSeparator />
 
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Add to Playlist</DropdownMenuSubTrigger>
+          <DropdownMenuSubTrigger disabled={!props.userPlaylists.length}>
+            Add to Playlist
+          </DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
             {props.userPlaylists.map((playlist) => (
               <DropdownMenuItem
@@ -148,7 +150,11 @@ function SongActions(props: {
         </DropdownMenuSub>
 
         <DropdownMenuItem
-          onClick={() => handleClick(props.currentPlaylistId, "DELETE")}
+          disabled={!props.currentPlaylistId}
+          onClick={() => {
+            if (!props.currentPlaylistId) return;
+            handleClick(props.currentPlaylistId, "DELETE");
+          }}
         >
           Remove from playlist
           <Icons.Trash className="ml-auto h-4 w-4" />
