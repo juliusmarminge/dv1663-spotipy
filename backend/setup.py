@@ -136,6 +136,30 @@ triggers['after_playlist_insert'] = ( #adds newly inserted song to global playli
 
 )
 
+triggers['after_update_song'] = (# Always keeps the songs with the most played_times in the global playlist
+    """CREATE TRIGGER after_update_song
+	AFTER UPDATE ON songs
+    FOR EACH ROW
+    BEGIN
+        DECLARE song_to_replace INT;
+        DECLARE min_value INT;
+        IF NEW.played_times > OLD.played_times THEN
+                            
+            SELECT MIN(played_times) INTO min_value FROM global_with_played;
+            IF NEW.played_times >  min_value AND NEW.id NOT IN (SELECT song_id FROM global_with_played) THEN
+                SELECT song_id INTO song_to_replace FROM global_with_played
+                    WHERE played_times = min_value
+                    LIMIT 1;
+                    
+                DELETE FROM playlist_songs WHERE playlist_id = 1 AND song_id = song_to_replace;
+                INSERT INTO playlist_songs (playlist_id, song_id) VALUES(1, NEW.id);
+            END IF;
+            
+        END IF;
+    
+    END;"""
+)
+
 def create_database(cursor):
     try:
         cursor.execute(f"CREATE DATABASE {DB_NAME} DEFAULT CHARACTER SET 'utf8'")
