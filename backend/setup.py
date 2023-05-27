@@ -26,6 +26,7 @@ TABLES["songs"] = (
     "  `artist_id` int NOT NULL,"
     "  `mp3_path` varchar(255) NOT NULL,"
     "  `cover_path` varchar(255) NOT NULL,"
+    "  `played_times` int DEFAULT 0,"
     "  PRIMARY KEY (`id`),"
     "  FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`)"
     ")"
@@ -107,6 +108,23 @@ functions[
 
 triggers = {}
 
+triggers['after_playlist_insert'] = ( #adds newly inserted song to global playlist if it has less than 10 songs.
+    """CREATE TRIGGER after_insert_song
+	AFTER INSERT ON songs
+    FOR EACH ROW
+    BEGIN
+        DECLARE nr_of_songs INT;
+        SELECT COUNT(playlist_songs.song_id)
+            INTO nr_of_songs FROM playlist_songs 
+            WHERE playlist_songs.playlist_id = 1;
+        
+        IF nr_of_songs < 10 THEN
+            INSERT INTO playlist_songs(playlist_id, song_id)
+            VALUES (1, NEW.id);
+        END IF;
+    END;"""
+
+)
 
 def create_database(cursor):
     try:

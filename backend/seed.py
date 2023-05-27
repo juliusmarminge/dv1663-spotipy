@@ -31,11 +31,11 @@ SONGS = [
 
 def insert_song(cursor, title, artist_id, mp3_path, cover_path):
     query = (
-        "INSERT INTO songs (title, artist_id, mp3_path, cover_path) "
-        "VALUES (%s, %s, %s, %s)"
+        "INSERT INTO songs (title, artist_id, mp3_path, cover_path, played_times) "
+        "VALUES (%s, %s, %s, %s, %s)"
     )
 
-    values = (title, artist_id, mp3_path, cover_path)
+    values = (title, artist_id, mp3_path, cover_path, 0)
     try:
         print(f"Inserting song '{title}': ", end="")
         cursor.execute(query, values)
@@ -79,14 +79,14 @@ def initialize_toplist(cursor):
     except MySQLError as err:
         print(err)
 
-    playlist_id = cursor.lastrowid
-    # Add songs to playlist
-    for song_id in range(1, len(SONGS) + 1):
-        try:
-            query = f"INSERT INTO playlist_songs (playlist_id, song_id) VALUES ({playlist_id}, {song_id})"
-            cursor.execute(query)
-        except MySQLError as err:
-            print(err)
+    # playlist_id = cursor.lastrowid
+    # # Add songs to playlist
+    # for song_id in range(1, len(SONGS) + 1):
+    #     try:
+    #         query = f"INSERT INTO playlist_songs (playlist_id, song_id) VALUES ({playlist_id}, {song_id})"
+    #         cursor.execute(query)
+    #     except MySQLError as err:
+    #         print(err)
 
 
 if __name__ == "__main__":
