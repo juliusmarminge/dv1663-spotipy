@@ -20,7 +20,7 @@ import {
   DialogTrigger,
 } from "./dialog";
 import { Input } from "./input";
-import { API_URL, LS_COOKIE_NAME } from "~/app/contants";
+import { API_URL, LS_COOKIE_NAME } from "~/lib/contants";
 import { User } from "~/types/models";
 import Image from "next/image";
 import { useRouter } from "next/navigation";

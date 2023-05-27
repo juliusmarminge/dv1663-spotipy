@@ -5,6 +5,7 @@ import * as Icons from "~/components/icons";
 import { UserSwitcher } from "~/components/user-switcher";
 import { Playbar } from "~/components/playbar";
 import { twMerge } from "tailwind-merge";
+import { SearchBox } from "~/components/search-box";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -33,9 +34,7 @@ export default async function RootLayout({
                   <li className="flex items-center gap-4 hover:text-foreground-muted cursor-pointer">
                     <Icons.Home /> Home
                   </li>
-                  <li className="flex items-center gap-4 hover:text-foreground-muted cursor-pointer">
-                    <Icons.Search /> Search
-                  </li>
+                  <SearchBox />
                 </ul>
               </nav>
               {/* @ts-expect-error */}

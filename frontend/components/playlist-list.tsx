@@ -1,6 +1,6 @@
 import { Playlist } from "~/types/models";
 import { CreatePlaylistForm } from "~/components/playlist-form";
-import { API_URL, LS_COOKIE_NAME } from "~/app/contants";
+import { API_URL, LS_COOKIE_NAME } from "~/lib/contants";
 import { cookies } from "next/headers";
 import { PlaylistListItem } from "~/components/playlist-list-item";
 

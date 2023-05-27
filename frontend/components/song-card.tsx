@@ -3,7 +3,7 @@
 import * as React from "react";
 import * as Icons from "~/components/icons";
 import type { Artist, Playlist, Song } from "~/types/models";
-import { useCurrentSong, useIsPlaying } from "~/app/atoms";
+import { useCurrentSong, useIsPlaying } from "~/lib/atoms";
 import { twMerge } from "tailwind-merge";
 import {
   DropdownMenu,
@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator,
 } from "~/components/dropdown-menu";
 import Link from "next/link";
-import { API_URL, LS_COOKIE_NAME } from "~/app/contants";
+import { API_URL, LS_COOKIE_NAME } from "~/lib/contants";
 import { useRouter } from "next/navigation";
 
 export function SongCard(

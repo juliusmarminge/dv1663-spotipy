@@ -1,8 +1,9 @@
 import { Playlist, Song } from "~/types/models";
 import { SongCard } from "~/components/song-card";
-import { API_URL, LS_COOKIE_NAME } from "~/app/contants";
+import { API_URL, LS_COOKIE_NAME } from "~/lib/contants";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { getUserPlaylists } from "~/lib/fetch-helpers";
 
 // Don't cache this page
 export const dynamic = "force-dynamic";
@@ -29,16 +30,7 @@ export default async function Home(props: { params: { id: string } }) {
     );
   }
 
-  const user = cookies().get(LS_COOKIE_NAME)?.value;
-  const playlists = (await fetch(`${API_URL}/playlists`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(user ? { Authorization: user } : {}),
-    },
-  }).then((res) => res.json())) as Playlist[];
-  const userPlaylists = playlists.filter(
-    (p) => p.user_id === JSON.parse(user || "{}").id
-  );
+  const userPlaylists = await getUserPlaylists();
 
   return (
     <div className="flex flex-col gap-2 overflow-scroll p-4">

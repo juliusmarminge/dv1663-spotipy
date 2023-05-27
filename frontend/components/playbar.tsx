@@ -1,9 +1,9 @@
 "use client";
 import * as React from "react";
-import { useCurrentSong, useIsPlaying } from "~/app/atoms";
+import { useCurrentSong, useIsPlaying } from "~/lib/atoms";
 import * as Icons from "~/components//icons";
 import { Slider } from "~/components/slider";
-import { API_URL } from "~/app/contants";
+import { API_URL } from "~/lib/contants";
 import { twMerge } from "tailwind-merge";
 
 function useInterval(callback: (...args: any[]) => any, delay: number) {

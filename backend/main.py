@@ -26,7 +26,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/artists/{artist_id}")
-async def get_artist(artist_id: int, response: Response):
+async def songs_by_artist(artist_id: int, response: Response):
     """Get all songs from the playlist with the playlist_id."""
     cnx = mysql.connector.connect(**config)
     cursor = cnx.cursor(dictionary=True)
@@ -324,6 +324,34 @@ async def register_play(
 
     response.status_code = 201
     return {"message": "Ok"}
+
+
+@app.get("/songs/")
+async def search_songs(
+    search: str,
+    response: Response,
+):
+    """Searches for songs that match the search query"""
+    cnx = mysql.connector.connect(**config)
+    cursor = cnx.cursor(dictionary=True)
+    cursor.execute("USE {}".format(DB_NAME))
+
+    if search is None:
+        cursor.execute("SELECT * FROM songs")
+    else:
+        cursor.execute(
+            "SELECT S.*, A.name as artist_name FROM songs S "
+            "   INNER JOIN artists A ON S.artist_id = A.id "
+            "WHERE S.title LIKE %s OR A.name LIKE %s "
+            "ORDER BY S.played_times DESC",
+            (f"%{search}%", f"%{search}%"),
+        )
+
+    songs = cursor.fetchall()
+    cursor.close()
+    cnx.close()
+
+    return songs
 
 
 class UserPayload(BaseModel):
