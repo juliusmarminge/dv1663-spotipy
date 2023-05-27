@@ -37,7 +37,7 @@ export default async function Home(props: { params: { id: string } }) {
     },
   }).then((res) => res.json())) as Playlist[];
   const userPlaylists = playlists.filter(
-    (p) => p.user_id === JSON.parse(user ?? "{}").id
+    (p) => p.user_id === JSON.parse(user || "{}").id
   );
 
   return (
