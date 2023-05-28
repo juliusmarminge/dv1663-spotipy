@@ -12,7 +12,7 @@ DB_NAME = "spotipy"
 TABLES = {}
 TABLES["artists"] = (
     "CREATE TABLE `artists` ("
-    "  `id` int NOT NULL AUTO_INCREMENT,"
+    "  `id` bigint NOT NULL AUTO_INCREMENT,"
     "  `name` varchar(255) NOT NULL,"
     "  `biography` varchar(255) NOT NULL,"
     "  PRIMARY KEY (`id`)"
@@ -21,12 +21,12 @@ TABLES["artists"] = (
 
 TABLES["songs"] = (
     "CREATE TABLE `songs` ("
-    "  `id` int NOT NULL AUTO_INCREMENT,"
+    "  `id` bigint NOT NULL AUTO_INCREMENT,"
     "  `title` varchar(255) NOT NULL,"
-    "  `artist_id` int NOT NULL,"
+    "  `artist_id` bigint NOT NULL,"
     "  `mp3_path` varchar(255) NOT NULL,"
     "  `cover_path` varchar(255) NOT NULL,"
-    "  `played_times` int DEFAULT 0,"
+    "  `played_times` bigint DEFAULT 0,"
     "  PRIMARY KEY (`id`),"
     "  FOREIGN KEY (`artist_id`) REFERENCES `artists` (`id`)"
     ")"
@@ -34,7 +34,7 @@ TABLES["songs"] = (
 
 TABLES["users"] = (
     "CREATE TABLE `users` ("
-    "  `id` int NOT NULL AUTO_INCREMENT,"
+    "  `id` bigint NOT NULL AUTO_INCREMENT,"
     "  `username` varchar(255) NOT NULL,"
     "  `password` varchar(255) NOT NULL,"
     "  PRIMARY KEY (`id`),"
@@ -44,9 +44,9 @@ TABLES["users"] = (
 
 TABLES["playlists"] = (
     "CREATE TABLE `playlists` ("
-    "  `id` int NOT NULL AUTO_INCREMENT,"
+    "  `id` bigint NOT NULL AUTO_INCREMENT,"
     "  `name` varchar(255) NOT NULL,"
-    "  `user_id` int NOT NULL,"
+    "  `user_id` bigint NOT NULL,"
     "  PRIMARY KEY (`id`),"
     "  FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)"
     ")"
@@ -54,8 +54,8 @@ TABLES["playlists"] = (
 
 TABLES["playlist_songs"] = (
     "CREATE TABLE `playlist_songs` ("
-    "  `playlist_id` int NOT NULL,"
-    "  `song_id` int NOT NULL,"
+    "  `playlist_id` bigint NOT NULL,"
+    "  `song_id` bigint NOT NULL,"
     "  PRIMARY KEY (`playlist_id`, `song_id`),"  # don't allow duplicate songs in the same playlist
     "  FOREIGN KEY (`playlist_id`) REFERENCES `playlists` (`id`) ON DELETE CASCADE,"
     "  FOREIGN KEY (`song_id`) REFERENCES `songs` (`id`)"
@@ -64,13 +64,13 @@ TABLES["playlist_songs"] = (
 
 views = {}
 
-views['global_with_played'] = ( # shows the global playlist songs along with the their played_times
-    """CREATE OR REPLACE VIEW global_with_played AS
+views[
+    "global_with_played"
+] = """CREATE OR REPLACE VIEW global_with_played AS
 	    SELECT playlist_songs.playlist_id, playlist_songs.song_id, songs.played_times
 		    FROM playlist_songs
 		    INNER JOIN songs ON playlist_songs.song_id = songs.id
-		    WHERE playlist_songs.playlist_id = 1;"""
-)
+		    WHERE playlist_songs.playlist_id = 1;"""  # shows the global playlist songs along with the their played_times
 
 procedures = {}
 
@@ -118,8 +118,9 @@ functions[
 
 triggers = {}
 
-triggers['after_playlist_insert'] = ( #adds newly inserted song to global playlist if it has less than 10 songs.
-    """CREATE TRIGGER after_insert_song
+triggers[
+    "after_playlist_insert"
+] = """CREATE TRIGGER after_insert_song
 	AFTER INSERT ON songs
     FOR EACH ROW
     BEGIN
@@ -132,12 +133,11 @@ triggers['after_playlist_insert'] = ( #adds newly inserted song to global playli
             INSERT INTO playlist_songs(playlist_id, song_id)
             VALUES (1, NEW.id);
         END IF;
-    END;"""
+    END;"""  # adds newly inserted song to global playlist if it has less than 10 songs.
 
-)
-
-triggers['after_update_song'] = (# Always keeps the songs with the most played_times in the global playlist
-    """CREATE TRIGGER after_update_song
+triggers[
+    "after_update_song"
+] = """CREATE TRIGGER after_update_song
 	AFTER UPDATE ON songs
     FOR EACH ROW
     BEGIN
@@ -157,8 +157,8 @@ triggers['after_update_song'] = (# Always keeps the songs with the most played_t
             
         END IF;
     
-    END;"""
-)
+    END;"""  # Always keeps the songs with the most played_times in the global playlist
+
 
 def create_database(cursor):
     try:
@@ -179,6 +179,7 @@ def create_table(cursor, name, query):
         else:
             print(err.msg)
 
+
 def create_view(cursor, name, query):
     try:
         print(f"Creating view {name}: ", end="")
@@ -186,6 +187,7 @@ def create_view(cursor, name, query):
         print("OK")
     except MySQLError as err:
         print(err.msg)
+
 
 def create_procedure(cursor, name, query):
     try:
