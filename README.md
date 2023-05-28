@@ -1,32 +1,35 @@
-# spotipy
+# spotipy music player
 
-Project whiteboard: https://app.eraser.io/workspace/rPjgfC98r5UL9Q9EIZBu
+## Architecture
 
-## ideas
+![arch](https://github.com/juliusmarminge/spotipy/assets/51714798/f37599a4-21d2-49c6-abcc-6b9953e20280)
 
-- **users** can sign up and create an **account** on the app
-- **accounts** can create **playlists** and add **songs** to their **playlist**.
-- **songs** are created by **artists** and published in **albums** (singles are represented as single-song-albums)
-- **albums** contain metadata such as **release date**, **description**, **genres** **(more?)**
-- **users** can like **albums**, **artists** and **songs** to "save" them to their **library**, which also contains the **users's** **playlists**
-- **Program** can automatically create recommended **playlists** based on **users** liked **songs**, **artists** or **albums**
+## ER Diagram
 
-### functions / procedures
+![er](https://github.com/juliusmarminge/spotipy/assets/51714798/b818c673-4b0f-4f68-a915-3e8a8352dd38)
 
-- **Playlist** creation
-- "Saving" to **library** or **playlists**
-- **Song** creation by **artists**
+## SQL Tables
 
-### triggers
+![tables](https://github.com/juliusmarminge/spotipy/assets/51714798/b95c6b07-0fb7-4ce9-9ac5-b4541127b42b)
 
-- "Update" **user's** listening history after listening to a **song**
-- Create and update the recommended **playlist** after a specific duration of time?
+## Quickstart
 
-## implementation alternatives
+This project includes a [backend](./backend/README.md) and a [frontend](./frontend/README.md). Refer to the respective README for how to run the application. TL;DR
 
-- an api or sdk to fetch data?
-- web-view w/ an actual music player?
-  - how to store the actual songs? url's to youtube or similar? encode the data?
+```bash
+# in terminal 1
+cd backend
+pip3 install -r requirements.tsx
 
+docker compose up -d
 
- 
+python3 setup.py
+python3 seed.py
+
+uvicorn main:app --reload
+
+# in terminal 2
+cd frontend
+npm install
+npm run dev
+```
