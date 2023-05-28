@@ -3,6 +3,7 @@
 ## Getting Started
 
 Make sure the backend is started. Refer to [their setup guide](../backend/README.md).
+Make sure to install Node.js as well.
 
 Install deps:
 
