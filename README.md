@@ -24,12 +24,14 @@ npm run dev
 
 # Architecture
 
-![arch](https://github.com/juliusmarminge/spotipy/assets/51714798/f37599a4-21d2-49c6-abcc-6b9953e20280)
+![arch](https://github.com/juliusmarminge/spotipy/assets/51714798/70b39bd2-3d3b-44bd-8494-3c5e70fb2f27)
 
 # ER Diagram
 
-![er](https://github.com/juliusmarminge/spotipy/assets/51714798/b818c673-4b0f-4f68-a915-3e8a8352dd38)
+![er](https://github.com/juliusmarminge/spotipy/assets/51714798/b9b60874-172e-4b8f-8b4b-a0704cc6bff8)
+
 
 # SQL Tables
 
-![tables](https://github.com/juliusmarminge/spotipy/assets/51714798/b95c6b07-0fb7-4ce9-9ac5-b4541127b42b)
+![tables](https://github.com/juliusmarminge/spotipy/assets/51714798/bdc29afc-9108-49c2-aaa8-a20ce75670ac)
+
