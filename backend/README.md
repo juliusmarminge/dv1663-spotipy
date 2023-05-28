@@ -14,7 +14,17 @@ pip3 install -r requirements.txt
 docker compose up -d
 ```
 
-3. Initialize the database
+If you prefer a different MySQL server, make sure the credentials are matched in [the configuration object](./setup.py):
+
+```python
+config = {
+    "host": "127.0.0.1",
+    "user": "root",
+    "password": "password",
+}
+```
+
+3. Initialize the database. The following script will initialize the database with the all the tables, triggers, procedures etc, as well as seeding it with some default data.
 
 ```bash
 python3 setup.py

@@ -1,14 +1,14 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Spotipy Frontend
 
 ## Getting Started
 
-Make sure the backend is started. Refer to [the setup guide](../backend/README.md).
+Make sure the backend is started. Refer to [their setup guide](../backend/README.md).
 
 Install deps:
 
 ```bash
 npm install
-# or, using pnpm
+# or, if you prefer using pnpm
 pnpm install
 ```
 

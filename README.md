@@ -2,7 +2,7 @@
 
 # Quickstart
 
-This project includes a [backend](./backend/README.md) and a [frontend](./frontend/README.md). Refer to the respective README for how to run the application. TL;DR
+This project includes a [backend](./backend) and a [frontend](./frontend). Refer to the respective README for how to run the application. TL;DR
 
 ```bash
 # in terminal 1
