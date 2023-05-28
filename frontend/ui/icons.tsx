@@ -1,3 +1,7 @@
+/**
+ * Icons from Lucide Icons (https://lucide.dev/).
+ */
+
 import { twMerge } from "tailwind-merge";
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {}
