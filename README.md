@@ -28,8 +28,7 @@ npm run dev
 
 # ER Diagram
 
-![er](https://github.com/juliusmarminge/spotipy/assets/51714798/b9b60874-172e-4b8f-8b4b-a0704cc6bff8)
-
+![image](https://github.com/juliusmarminge/dv1663-spotipy/assets/51714798/34b1cfa5-9343-4cdb-a278-fe1dbe25a0a3)
 
 # SQL Tables
 
